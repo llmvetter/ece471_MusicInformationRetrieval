@@ -86,6 +86,7 @@ def train_classifier_model(train_dataset, test_dataset, C=2**np.arange(-8, 1).as
 
         score = logreg_model.score(teX, teY)
         scores.append(score)
+        print(f"| Iteration {i+1}/{len(C)}: C = {c:.6f} | Test Accuracy = {score * 100:.2f}%")
 
     c = C[np.argmax(scores)]
 
