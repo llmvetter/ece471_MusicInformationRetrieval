@@ -11,13 +11,13 @@ from train_classifier import preprocess_sentence
 GENERATED_DIR = './generated'
 
 def override_neurons(model, layer_idx, override):
-    h_state, c_state = model.get_layer(index=layer_idx).states
+    h_state_var, c_state_var = model.get_layer(index=layer_idx).states
 
-    c_state = c_state.numpy()
+    c_state = c_state_var.numpy()
     for neuron, value in override.items():
         c_state[:,int(neuron)] = int(value)
 
-    model.get_layer(index=layer_idx).states = (h_state, tf.Variable(c_state))
+    c_state_var.assign(c_state)
 
 def sample_next(predictions, k):
     # Sample using a categorical distribution over the top k midi chars
