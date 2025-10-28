@@ -14,8 +14,8 @@ def generative_loss(labels, logits):
 
 def build_generative_model(vocab_size, embed_dim, lstm_units, lstm_layers, batch_size, dropout=0):
     model = tf.keras.Sequential()
-
-    model.add(tf.keras.layers.Embedding(vocab_size, embed_dim, batch_input_shape=[batch_size, None]))
+    model.add(tf.keras.layers.Input(batch_shape=[batch_size, None]))
+    model.add(tf.keras.layers.Embedding(vocab_size, embed_dim))
 
     for i in range(max(1, lstm_layers)):
         model.add(tf.keras.layers.LSTM(lstm_units, return_sequences=True, stateful=True, dropout=dropout, recurrent_dropout=dropout))
