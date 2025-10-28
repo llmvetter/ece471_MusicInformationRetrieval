@@ -7,6 +7,7 @@ import numpy as np
 import tensorflow as tf
 import midi_encoder as me
 import plot_results as pr
+import random
 
 from train_generative import build_generative_model
 from sklearn.linear_model import LogisticRegression
@@ -47,10 +48,14 @@ def encode_sentence(model, text, char2idx, layer_idx):
 def build_dataset(datapath, generative_model, char2idx, layer_idx):
     xs, ys = [], []
 
-    csv_file = open(datapath, "r")
-    data = csv.DictReader(csv_file)
+    with open(datapath, "r") as csv_file:
+        all_rows = list(csv.DictReader(csv_file))
+    
+    total_rows = len(all_rows)
+    sample_size = int(total_rows * 0.05)
+    sampled_rows = random.sample(all_rows, sample_size)
 
-    for row in data:
+    for row in sampled_rows:
         label = int(row["label"])
         filepath = row["filepath"]
 
