@@ -24,7 +24,7 @@ def encode_sentence(model, text, char2idx, layer_idx):
     text = preprocess_sentence(text)
 
     # Reset LSTMs hidden and cell states
-    for layer in generative_model.layers:
+    for layer in model.layers:
         if hasattr(layer, 'reset_states'):
             layer.reset_states()
 
