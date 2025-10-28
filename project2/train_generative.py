@@ -58,7 +58,7 @@ def train_generative_model(model, train_dataset, test_dataset, epochs, learning_
     model.compile(optimizer=optimizer, loss=generative_loss)
 
     # Name of the checkpoint files
-    checkpoint_prefix = os.path.join(TRAIN_DIR, "/generative_ckpt_{epoch}.weights.h5}")
+    checkpoint_prefix = f"/generative_ckpt_{epochs}.weights.h5"
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_prefix, save_weights_only=True)
 
     return model.fit(train_dataset, epochs=epochs, validation_data=test_dataset, callbacks=[checkpoint_callback])
