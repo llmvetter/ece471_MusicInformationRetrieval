@@ -34,7 +34,9 @@ def sample_next(predictions, k):
     return predicted_id
 
 def process_init_text(model, init_text, char2idx, layer_idx, override):
-    model.reset_states()
+    for layer in model.layers:
+        if hasattr(layer, 'reset_states'):
+            layer.reset_states()
 
     for c in init_text.split(" "):
         # Run a forward pass
