@@ -23,7 +23,9 @@ def encode_sentence(model, text, char2idx, layer_idx):
     text = preprocess_sentence(text)
 
     # Reset LSTMs hidden and cell states
-    model.reset_states()
+    for layer in generative_model.layers:
+        if hasattr(layer, 'reset_states'):
+            layer.reset_states()
 
     for c in text.split(" "):
         # Add the batch dimension
