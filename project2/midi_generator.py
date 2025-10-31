@@ -9,6 +9,7 @@ from train_generative import build_generative_model
 from train_classifier import preprocess_sentence
 
 GENERATED_DIR = './generated'
+TRAIN_DIR = "./trained"
 
 def override_neurons(model, layer_idx, override):
     h_state_var, c_state_var = model.get_layer(index=layer_idx).states
@@ -123,7 +124,7 @@ if __name__ == "__main__":
 
     # Rebuild model from checkpoint
     model = build_generative_model(vocab_size, opt.embed, opt.units, opt.layers, batch_size=1)
-    weights_path = os.path.join(GENERATED_DIR, "generative_ckpt.weights.h5")
+    weights_path = os.path.join(TRAIN_DIR, "generative_ckpt.weights.h5")
     model.load_weights(weights_path)
     model.build(tf.TensorShape([1, None]))
 
