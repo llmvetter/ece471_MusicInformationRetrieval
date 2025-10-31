@@ -74,7 +74,7 @@ def generate_midi(model, char2idx, idx2char, init_text="", seq_len=256, k=3, lay
         predictions = tf.squeeze(predictions, 0).numpy()
 
         # Sample using a categorical distribution over the top k midi chars
-        predicted_id = sample_next(predictions, k)
+        predicted_id = sample_next(predictions, int(k))
 
          # Append it to generated midi
         midi_generated.append(idx2char[predicted_id])
