@@ -154,7 +154,7 @@ if __name__ == "__main__":
 
     # Rebuild generative model from checkpoint
     generative_model = build_generative_model(vocab_size, opt.embed, opt.units, opt.layers, batch_size=1)
-    weights_path = os.path.join(opt.model, "generative_ckpt.weights.h5")
+    weights_path = os.path.join(TRAIN_DIR, "generative_ckpt.weights.h5")
     generative_model.load_weights(weights_path)
     generative_model.build(tf.TensorShape([1, None]))
 
