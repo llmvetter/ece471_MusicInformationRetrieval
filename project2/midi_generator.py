@@ -101,6 +101,7 @@ if __name__ == "__main__":
     parser.add_argument('--seqlen', type=int, default=256, help="Sequence lenght.")
     parser.add_argument('--cellix', type=int, default=-2, help="LSTM layer to use as encoder.")
     parser.add_argument('--override', type=str, default="", help="JSON file with neuron values to override.")
+    parser.add_argument('--topk', type=str, default=10, help="Top k to sample from during generation.")
     opt = parser.parse_args()
 
     # Load char2idx dict from json file
@@ -129,7 +130,7 @@ if __name__ == "__main__":
     model.build(tf.TensorShape([1, None]))
 
     # Generate a midi as text
-    midi_txt = generate_midi(model, char2idx, idx2char, opt.seqinit, opt.seqlen, layer_idx=opt.cellix, override=override)
+    midi_txt = generate_midi(model, char2idx, idx2char, opt.seqinit, opt.seqlen, layer_idx=opt.cellix, k=opt.topk, override=override)
     print(midi_txt)
 
     me.write(midi_txt, os.path.join(GENERATED_DIR, "generated.mid"))
