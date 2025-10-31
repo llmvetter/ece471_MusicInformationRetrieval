@@ -65,9 +65,10 @@ def generate_midi(model, char2idx, idx2char, init_text="", seq_len=256, k=3, lay
     predictions = process_init_text(model, init_text, char2idx, layer_idx, override)
 
     # Here batch size == 1
-    for layer in model.layers:
-        if hasattr(layer, 'reset_states'):
-            layer.reset_states()
+    # --------- 10/31 6:16pm commenting this out since this might be the cause of bad file generation
+    # for layer in model.layers:
+    #     if hasattr(layer, 'reset_states'):
+    #         layer.reset_states()
 
     for i in range(seq_len):
         # remove the batch dimension
