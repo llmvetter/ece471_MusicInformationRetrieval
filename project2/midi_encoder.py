@@ -373,3 +373,4 @@ if __name__ == "__main__":
 
     # Write all data to midi file
     write(text, "encoded.mid")
+    exit()
