@@ -52,7 +52,7 @@ def build_dataset(datapath, generative_model, char2idx, layer_idx):
         all_rows = list(csv.DictReader(csv_file))
     
     total_rows = len(all_rows)
-    sample_size = int(total_rows * 0.5)
+    sample_size = int(total_rows * 1)
     sampled_rows = random.sample(all_rows, sample_size)
 
     for row in sampled_rows:
