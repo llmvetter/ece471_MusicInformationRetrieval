@@ -6,7 +6,6 @@ import argparse
 import numpy as np
 import tensorflow as tf
 import midi_encoder as me
-import plot_results as pr
 import random
 
 from train_generative import build_generative_model
@@ -108,10 +107,6 @@ def train_classifier_model(train_dataset, test_dataset, C=2**np.arange(-8, 1).as
 
     # Get activated neurons
     sentneuron_ixs = get_activated_neurons(sent_classfier)
-
-    # Plot results
-    pr.plot_weight_contribs(sent_classfier.coef_)
-    pr.plot_logits(trX, trY, sentneuron_ixs)
 
     return sentneuron_ixs, score
 
