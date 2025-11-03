@@ -20,18 +20,15 @@ def override_neurons(model, layer_idx, override):
 
     c_state_var.assign(c_state)
 
-def sample_next(predictions, k):
+def sample_next(predictions, k, temp=2):
+    predictions = predictions / temp
     # Sample using a categorical distribution over the top k midi chars
     top_k = tf.math.top_k(predictions, k)
     top_k_choices = top_k[1].numpy().squeeze()
     top_k_values = top_k[0].numpy().squeeze()
 
-    if np.random.uniform(0, 1) < .5:
-        predicted_id = top_k_choices[0]
-    else:
-        p_choices = tf.math.softmax(top_k_values[1:]).numpy()
-        predicted_id = np.random.choice(top_k_choices[1:], 1, p=p_choices)[0]
-
+    p_choices = tf.math.softmax(top_k_values).numpy()
+    predicted_id = np.random.choice(top_k_choices, 1, p=p_choices)[0]
     return predicted_id
 
 def process_init_text(model, init_text, char2idx, layer_idx, override):
