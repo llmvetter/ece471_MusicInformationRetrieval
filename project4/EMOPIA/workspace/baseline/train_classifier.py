@@ -1,4 +1,6 @@
 import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "4"
+
 import csv
 import json
 import pickle
@@ -6,13 +8,17 @@ import argparse
 import numpy as np
 import tensorflow as tf
 import midi_encoder as me
-import random
+import plot_results_base as pr
 
 from train_generative import build_generative_model
 from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import LabelBinarizer
 
 # Directory where trained model will be saved
 TRAIN_DIR = "./trained"
+DATA_TRAIN = '../data/train_split.csv'
+DATA_TEST = '../data/test_split.csv'
+DATASET_PATH = '../'
 
 def preprocess_sentence(text, front_pad='\n ', end_pad=''):
     text = text.replace('\n', ' ').strip()
@@ -23,9 +29,7 @@ def encode_sentence(model, text, char2idx, layer_idx):
     text = preprocess_sentence(text)
 
     # Reset LSTMs hidden and cell states
-    for layer in model.layers:
-        if hasattr(layer, 'reset_states'):
-            layer.reset_states()
+    model.reset_states()
 
     for c in text.split(" "):
         # Add the batch dimension
@@ -47,20 +51,19 @@ def encode_sentence(model, text, char2idx, layer_idx):
 def build_dataset(datapath, generative_model, char2idx, layer_idx):
     xs, ys = [], []
 
-    with open(datapath, "r") as csv_file:
-        all_rows = list(csv.DictReader(csv_file))
-    
-    total_rows = len(all_rows)
-    sample_size = int(total_rows * 1)
-    sampled_rows = random.sample(all_rows, sample_size)
+    csv_file = open(datapath, "r")
+    data = csv.DictReader(csv_file)
 
-    for row in sampled_rows:
+    for row in data:
         label = int(row["label"])
         filepath = row["filepath"]
 
         data_dir = os.path.dirname(datapath)
-        phrase_path = os.path.join(data_dir, filepath) + ".mid"
-        encoded_path = os.path.join(data_dir, filepath) + ".npy"
+        phrase_path = filepath.replace('./', '')
+        phrase_path = os.path.join(DATASET_PATH, phrase_path)
+        encoded_path = os.path.splitext(filepath)[0]+'.npy'
+        encoded_path = encoded_path.replace('./', '')
+        encoded_path = os.path.join(DATASET_PATH, encoded_path)
 
         # Load midi file as text
         if os.path.isfile(encoded_path):
@@ -79,7 +82,7 @@ def build_dataset(datapath, generative_model, char2idx, layer_idx):
 
     return np.array(xs), np.array(ys)
 
-def train_classifier_model(train_dataset, test_dataset, C=2**np.arange(-8, 1).astype(float), seed=42, penalty="l1"):
+def train_classifier_model(train_dataset, test_dataset, C=2**np.arange(-8, 1).astype(np.float), seed=42, penalty="l1"):
     trX, trY = train_dataset
     teX, teY = test_dataset
 
@@ -92,7 +95,6 @@ def train_classifier_model(train_dataset, test_dataset, C=2**np.arange(-8, 1).as
 
         score = logreg_model.score(teX, teY)
         scores.append(score)
-        print(f"| Iteration {i+1}/{len(C)}: C = {c:.6f} | Test Accuracy = {score * 100:.2f}%")
 
     c = C[np.argmax(scores)]
 
@@ -107,6 +109,10 @@ def train_classifier_model(train_dataset, test_dataset, C=2**np.arange(-8, 1).as
 
     # Get activated neurons
     sentneuron_ixs = get_activated_neurons(sent_classfier)
+
+    # Plot results
+    pr.plot_weight_contribs(sent_classfier.coef_)
+    pr.plot_logits(trX, trY, sentneuron_ixs)
 
     return sentneuron_ixs, score
 
@@ -130,14 +136,14 @@ if __name__ == "__main__":
 
     # Parse arguments
     parser = argparse.ArgumentParser(description='train_classifier.py')
-    parser.add_argument('--train', type=str, required=True, help="Train dataset.")
-    parser.add_argument('--test' , type=str, required=True, help="Test dataset.")
-    parser.add_argument('--model', type=str, required=True, help="Checkpoint dir.")
-    parser.add_argument('--ch2ix', type=str, required=True, help="JSON file with char2idx encoding.")
-    parser.add_argument('--embed', type=int, required=True, help="Embedding size.")
-    parser.add_argument('--units', type=int, required=True, help="LSTM units.")
-    parser.add_argument('--layers', type=int, required=True, help="LSTM layers.")
-    parser.add_argument('--cellix', type=int, required=True, help="LSTM layer to use as encoder.")
+    parser.add_argument('--train', type=str, default=DATA_TRAIN, help="Train dataset.")
+    parser.add_argument('--test' , type=str, default=DATA_TEST, help="Test dataset.")
+    parser.add_argument('--model', type=str, default='./trained/', help="Checkpoint dir.")
+    parser.add_argument('--ch2ix', type=str, default='./trained/char2idx.json', help="JSON file with char2idx encoding.")
+    parser.add_argument('--embed', type=int, default=256, help="Embedding size.")
+    parser.add_argument('--units', type=int, default=512, help="LSTM units.")
+    parser.add_argument('--layers', type=int, default=4, help="LSTM layers.")
+    parser.add_argument('--cellix', type=int, default=4, help="LSTM layer to use as encoder.")
     opt = parser.parse_args()
 
     # Load char2idx dict from json file
@@ -149,8 +155,7 @@ if __name__ == "__main__":
 
     # Rebuild generative model from checkpoint
     generative_model = build_generative_model(vocab_size, opt.embed, opt.units, opt.layers, batch_size=1)
-    weights_path = os.path.join(TRAIN_DIR, "generative_ckpt.weights.h5")
-    generative_model.load_weights(weights_path)
+    generative_model.load_weights(tf.train.latest_checkpoint(opt.model))
     generative_model.build(tf.TensorShape([1, None]))
 
     # Build dataset from encoded labelled midis
