@@ -1,0 +1,77 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{ismir} % Remove the "submission" option for camera-ready version
+\usepackage{amsmath,cite,url}
+\usepackage{graphicx}
+\usepackage{color}
+
+
+% Title. Please use IEEE-compliant title case when specifying the title here,
+% as it has implications for the copyright notice
+% ------
+\title{Sentiment Conditioned Symbolic Music Generation}
+
+% Two addresses
+% --------------
+\twoauthors
+   {Wongee Hong} {The Cooper Union \\ Albert Nerken School of Engineering}
+   {Lennart Vetter} {The Cooper Union \\ Albert Nerken School of Engineering}
+
+\def\authorname{W. Hong, and L. Vetter}
+
+\sloppy % please retain sloppy command for improved formatting
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This work applies a Transformer architecture to the task of symbolic music generation. The generative process is conditioned on sentiment to steer the perceived emotion of the generated piece of music.
+\end{abstract}
+
+\section{Introduction}\label{sec:introduction}
+To be done.
+\section{Body}
+To be done.
+
+\subsection{Data}\label{subsec:data}
+To be done.
+
+\subsection{Data Preprocessing}\label{subsec:data_prep}
+To be done.
+
+\subsection{Model}\label{subsec:model}
+To be done.
+
+\subsection{Conditioning Mechanism}\label{subsec:cond}
+To be done.
+
+\subsection{Training}\label{subsec:training}
+To be done.
+
+\section{Results}\label{sec:results}
+To be done.
+
+\subsection{Figures, Tables and Captions}
+Include at least one table to display the results and \textbf{Graph of the Model Architecture}
+
+All artwork must be centered, neat, clean, and legible. All lines should be very dark for purposes of reproduction and art work should not be hand-drawn. The proceedings are not in color, and therefore all figures must make sense in black-and-white form. \textbf{Figure and table numbers and captions always appear below the figure.} Leave 1 line space between the figure or table and the caption. Each figure or table is numbered consecutively. Captions should be Times 10pt. Place tables/figures in text as close to the reference as possible. References to tables and figures should be capitalized, for example, see \figref{fig:example} and \tabref{tab:example}. Figures and tables may extend across both columns to a maximum width of 17.2cm.
+
+\begin{table}
+  \centering
+  \begin{tabular}{|l|l|}
+    \hline
+    String value & Numeric value \\
+    \hline
+    Hello ISMIR  & \conferenceyear \\
+    \hline
+  \end{tabular}
+  \caption{Table captions should be placed below the table.}
+  \label{tab:example}
+\end{table}
+
+\begin{thebibliography}{citations}
+\bibitem{Author:17} Something
+\end{thebibliography}
+
+\end{document}
