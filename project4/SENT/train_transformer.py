@@ -132,9 +132,11 @@ def train_generative_model(model, train_dataset, test_dataset, epochs, learning_
     )
 
 def build_dataset(text, char2idx, seq_length, batch_size, buffer_size=10000):
-    text_as_int = np.array([char2idx[c] for c in text.split(" ")])
-    char_dataset = tf.data.Dataset.from_tensor_slices(text_as_int)
 
+    tokens = text.split(" ")
+    filtered_tokens = [c for c in tokens if c]
+    text_as_int = np.array([char2idx[c] for c in filtered_tokens])
+    char_dataset = tf.data.Dataset.from_tensor_slices(text_as_int
     sequences = char_dataset.batch(seq_length+1, drop_remainder=True)
 
     dataset = sequences.map(__split_input_target)
@@ -174,8 +176,8 @@ if __name__ == "__main__":
     parser.add_argument('--test', type=str, required=True, help="Test dataset.")
     parser.add_argument('--model', type=str, required=False, help="Checkpoint dir.")
     parser.add_argument('--embed', type=int, default=256, help="Embedding size.")
-    parser.add_argument('--heads', type=int, default=8, help="Number of attention heads.") # NEW ARG
-    parser.add_argument('--blocks', type=int, default=4, help="Number of decoder blocks.") # NEW ARG
+    parser.add_argument('--heads', type=int, default=8, help="Number of attention heads.")
+    parser.add_argument('--blocks', type=int, default=4, help="Number of decoder blocks.")
     parser.add_argument('--ffdim', type=int, default=1024, help="Feed Forward layer dimension.")
     parser.add_argument('--batch', type=int, default=64, help="Batch size.")
     parser.add_argument('--epochs', type=int, default=10, help="Epochs.")
