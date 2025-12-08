@@ -65,11 +65,16 @@ class TransformerDecoderBlock(layers.Layer):
         padding_mask = tf.cast(
             tf.equal(inputs, 0),
             dtype=tf.float32,
-        )[:, tf.newaxis, tf.newaxis, :]
+        )[:, tf.newaxis, :]
+
         combined_mask = tf.maximum(look_ahead_mask, padding_mask)
 
         # Apply attention
-        attn_output = self.att(inputs, inputs, attention_mask=combined_mask)
+        attn_output = self.att(
+            inputs,
+            inputs,
+            attention_mask=combined_mask,
+        )
         attn_output = self.dropout1(attn_output, training=training)
         
         # Add & Norm (Residual connection)
