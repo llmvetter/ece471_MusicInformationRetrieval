@@ -136,7 +136,7 @@ def build_dataset(text, char2idx, seq_length, batch_size, buffer_size=10000):
     tokens = text.split(" ")
     filtered_tokens = [c for c in tokens if c]
     text_as_int = np.array([char2idx[c] for c in filtered_tokens])
-    char_dataset = tf.data.Dataset.from_tensor_slices(text_as_int
+    char_dataset = tf.data.Dataset.from_tensor_slices(text_as_int)
     sequences = char_dataset.batch(seq_length+1, drop_remainder=True)
 
     dataset = sequences.map(__split_input_target)
