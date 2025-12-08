@@ -1,0 +1,6 @@
+char2idx.json
+trained/*
+__pycache__/*
+*.mid
+*.midi
+*.png
