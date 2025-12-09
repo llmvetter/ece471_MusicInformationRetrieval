@@ -51,12 +51,12 @@ class TransformerDecoderBlock(layers.Layer):
 
     def call(self, inputs, training=False):
 
-        padding_mask = tf.expand_dims(tf.cast(tf.equal(inputs, 0), tf.bool), axis=1) # Shape: (B, 1, T)
+        # padding_mask = tf.expand_dims(tf.cast(tf.equal(inputs, 0), tf.bool), axis=1) # Shape: (B, 1, T)
 
         attn_output = self.att(
             inputs,
             inputs,
-            attention_mask=padding_mask, 
+            #attention_mask=padding_mask, 
             use_causal_mask=True,
             training=training
         )
@@ -89,7 +89,7 @@ def build_transformer_model(
     Builds a Decoder-only Transformer model for generative MIDI sequence prediction.
     """
     # The input layer must *not* be batch_shape-specified for flexible inference later.
-    inputs = layers.Input(shape=(seq_length,), batch_size=batch_size, dtype=tf.int32)
+    inputs = layers.Input(shape=(seq_length,), dtype=tf.int32)
     
     # 1. Positional Encoding
     x = PositionalEncoding(seq_length, vocab_size, embed_dim)(inputs)
