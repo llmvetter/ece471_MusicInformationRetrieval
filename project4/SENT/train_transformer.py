@@ -128,9 +128,9 @@ def train_generative_model(model, train_dataset, test_dataset, epochs, learning_
     return model.fit(
         train_dataset,
         epochs=epochs,
-        steps_per_epoch=10,
+        steps_per_epoch=100,
         validation_data=test_dataset,
-        validation_steps=10,
+        validation_steps=100,
         callbacks=[checkpoint_callback],
     )
 
