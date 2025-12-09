@@ -139,9 +139,7 @@ def train_generative_model(model, train_dataset, test_dataset, epochs, learning_
     )
 
 def build_dataset(text, char2idx, seq_length, batch_size, buffer_size=10000):
-
-    tokens = text.split(" ")
-    text_as_int = np.array([char2idx[c] for c in tokens])
+    text_as_int = np.array([char2idx[c] for c in text.split(" ")])
     char_dataset = tf.data.Dataset.from_tensor_slices(text_as_int)
     sequences = char_dataset.batch(seq_length+1, drop_remainder=True)
 
