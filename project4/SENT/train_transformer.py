@@ -146,7 +146,7 @@ def build_dataset(text, char2idx, seq_length, batch_size, buffer_size=10000):
 
     dataset = sequences.map(__split_input_target)
     dataset = dataset.shuffle(buffer_size).batch(batch_size, drop_remainder=True)
-
+    dataset = dataset.repeat()
     return dataset
 
 def build_char2idx(train_vocab, test_vocab):
