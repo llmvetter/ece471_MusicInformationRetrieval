@@ -134,6 +134,7 @@ def train_generative_model(model, train_dataset, test_dataset, epochs, learning_
         epochs=epochs,
         steps_per_epoch=1000,
         validation_data=test_dataset,
+        validation_steps=1000,
         callbacks=[checkpoint_callback],
     )
 
@@ -198,6 +199,12 @@ if __name__ == "__main__":
 
     # 2. Build dictionary to map from char to integers
     char2idx, vocab_size = build_char2idx(train_vocab, test_vocab)
+
+    print(f"\n--- Data Check ---")
+    print(f"Token Count (Train): {len(train_text.split(' '))}")
+    print(f"Vocabulary Size: {vocab_size}")
+    if vocab_size == 0:
+        raise ValueError("Vocabulary size is 0. Check your MIDI files and 'me.load()' function.")
 
     # 3. Build dataset from encoded unlabelled midis
     train_dataset = build_dataset(train_text, char2idx, opt.seqlen, opt.batch)
