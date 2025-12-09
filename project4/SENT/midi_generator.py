@@ -24,6 +24,8 @@ def sample_next(predictions, k, temp=2):
     return predicted_id
 
 def process_init_text(model, init_text, char2idx):
+    print(f"DEBUG: Type of init_text is: {type(init_text)}")
+    print(f"DEBUG: Value of init_text is: {init_text}")
     tokens = init_text.split()
     input_eval = [char2idx[c] for c in tokens]
     input_tensor = tf.expand_dims(input_eval, 0)
