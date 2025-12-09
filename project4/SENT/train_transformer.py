@@ -17,21 +17,30 @@ class PositionalEncoding(layers.Layer):
     def __init__(self, sequence_length, vocab_size, embed_dim, **kwargs):
         super(PositionalEncoding, self).__init__(**kwargs)
         self.token_embeddings = layers.Embedding(vocab_size, embed_dim)
+        # Use the max sequence length to size the positional embedding layer
         self.position_embeddings = layers.Embedding(sequence_length, embed_dim)
 
     def call(self, inputs):
-        # position indices: 0, 1, 2, ..., sequence_length-1
-        sequence_length = tf.shape(inputs)[-1]
-        max_sequence_length = self.position_embeddings.input_dim
-        positions = tf.range(start=0, limit=max_sequence_length, delta=1)
-        current_positions = positions[:sequence_length]
+        # inputs shape is (Batch_Size, T)
+        
+        # 1. Get the actual sequence length (T) of the CURRENT input
+        sequence_length = tf.shape(inputs)[-1] 
+        
+        # 2. Get the position indices: 0, 1, 2, ..., T-1
+        # IMPORTANT: Use the current input's length (T) here.
+        current_positions = tf.range(start=0, limit=sequence_length, delta=1)
 
         # Get embeddings
         embedded_tokens = self.token_embeddings(inputs)
+        
+        # Look up position embeddings using the current position indices
         embedded_positions = self.position_embeddings(current_positions)
         
         # Add them together
+        # Note: If T=100, embedded_tokens is (B, 100, D) and embedded_positions is (100, D). This broadcasts correctly.
         return embedded_tokens + embedded_positions
+
+
 
 class TransformerDecoderBlock(layers.Layer):
     """
@@ -89,7 +98,7 @@ def build_transformer_model(
     Builds a Decoder-only Transformer model for generative MIDI sequence prediction.
     """
     # The input layer must *not* be batch_shape-specified for flexible inference later.
-    inputs = layers.Input(shape=(seq_length,), dtype=tf.int32)
+    inputs = layers.Input(shape=(None,), dtype=tf.int32)
     
     # 1. Positional Encoding
     x = PositionalEncoding(seq_length, vocab_size, embed_dim)(inputs)
