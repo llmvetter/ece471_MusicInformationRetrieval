@@ -33,13 +33,13 @@ def process_init_text(model, init_text, char2idx):
     return input_eval, last_prediction
 
 def generate_midi(
-        model,
-        char2idx,
-        idx2char,
-        init_text="",
-        seq_len=256,
-        gen_len=255,
-        k=3,
+    model,
+    char2idx,
+    idx2char,
+    init_text="",
+    seq_len=256,  # Max length the model was trained with
+    gen_len=255,  # Desired total output length
+    k=3,
 ):
 
     input_sequence_ids, last_prediction = process_init_text(
@@ -50,15 +50,33 @@ def generate_midi(
 
     midi_generated_ids = input_sequence_ids.copy()
     num_generate = gen_len - len(input_sequence_ids)
+    
     for i in range(num_generate):
 
-            predicted_id = sample_next(last_prediction, int(k))
-            midi_generated_ids.append(predicted_id)
-            input_tensor = tf.expand_dims(midi_generated_ids, 0)
-            predictions = model(input_tensor, training=False)
-            last_prediction = predictions[:, -1, :]
-            if idx2char[predicted_id] == "\n":
-                break
+        # 🛑 CRITICAL CHANGE 1: Truncate the input sequence
+        # Only keep the last 'seq_len' tokens to feed the model.
+        # This prevents the Positional Embedding index error.
+        current_input = midi_generated_ids[-seq_len:] 
+        
+        # Build the tensor from the *truncated* sequence
+        input_tensor = tf.expand_dims(current_input, 0)
+        
+        # Get predictions from the model using the truncated sequence
+        predictions = model(input_tensor, training=False)
+        
+        # Get the logits for the *last* token in the current_input (which is the prediction for the next token)
+        last_prediction = predictions[:, -1, :] 
+        
+        # Sample the next token
+        predicted_id = sample_next(last_prediction, int(k))
+        
+        # 🛑 CRITICAL CHANGE 2: Append the predicted ID to the *full* sequence list
+        # We append to midi_generated_ids to track the full generated text, 
+        # but only use the truncated version for the *model input*.
+        midi_generated_ids.append(predicted_id)
+
+        if idx2char[predicted_id] == "\n":
+            break
 
     generated_tokens = [idx2char[i] for i in midi_generated_ids]
     return " ".join(generated_tokens)
