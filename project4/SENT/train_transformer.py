@@ -126,7 +126,7 @@ def generative_loss(labels, logits):
 def train_generative_model(model, train_dataset, test_dataset, epochs, learning_rate):
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
     model.compile(optimizer=optimizer, loss=generative_loss)
-    checkpoint_prefix = os.path.join(TRAIN_DIR, f"transformer_ckpt")
+    checkpoint_prefix = os.path.join(TRAIN_DIR, f"transformer_ckpt.weights.h5")
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_prefix, save_weights_only=True)
 
     return model.fit(
