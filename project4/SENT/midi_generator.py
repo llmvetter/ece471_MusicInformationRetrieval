@@ -36,7 +36,7 @@ def generate_midi(model, char2idx, idx2char, init_text="", seq_len=256, k=3):
 
     input_sequence_ids, last_prediction = process_init_text(
         model = model, 
-        cahr2idx=char2idx, 
+        char2idx=char2idx, 
         init_text=init_text
     )
 
