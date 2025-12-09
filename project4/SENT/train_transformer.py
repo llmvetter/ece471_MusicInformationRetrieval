@@ -51,30 +51,17 @@ class TransformerDecoderBlock(layers.Layer):
 
     def call(self, inputs, training=False):
 
-        # 1. Masked Multi-Head Attention (Causal Self-Attention)
-        input_shape = tf.shape(inputs)
-        batch_size = input_shape[0]
-        sequence_length = input_shape[1]
-        
-        # Create a look-ahead mask (upper triangular matrix)
-        look_ahead_mask = 1 - tf.linalg.band_part(
-            tf.ones((sequence_length, sequence_length)),
-            -1,
-            0,
-        )
-        padding_mask = tf.cast(
-            tf.equal(inputs, 0),
-            dtype=tf.float32,
-        )[:, tf.newaxis, :]
+        padding_mask = tf.expand_dims(tf.cast(tf.equal(inputs, 0), tf.bool), axis=1) # Shape: (B, 1, T)
 
-        combined_mask = tf.maximum(look_ahead_mask, padding_mask)
-
-        # Apply attention
         attn_output = self.att(
             inputs,
             inputs,
-            attention_mask=combined_mask,
+            attention_mask=padding_mask, 
+            use_causal_mask=True,
+            training=training
         )
+
+        attn_output = self.dropout1(attn_output, training=training)
         attn_output = self.dropout1(attn_output, training=training)
         
         # Add & Norm (Residual connection)
