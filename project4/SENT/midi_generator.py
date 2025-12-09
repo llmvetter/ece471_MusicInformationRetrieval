@@ -32,7 +32,8 @@ def process_init_text(model, init_text, char2idx):
     return input_eval, last_prediction
 
 def generate_midi(model, char2idx, idx2char, init_text="", seq_len=256, k=3):
-
+    print(f"DEBUG: Type of init_text is: {type(init_text)}")
+    print(f"DEBUG: Value of init_text is: {init_text}")
     input_sequence_ids, last_prediction = process_init_text(
         model, 
         char2idx, 
