@@ -31,9 +31,8 @@ def process_init_text(model, init_text, char2idx):
     last_prediction = predictions[:, -1, :]
     return input_eval, last_prediction
 
-def generate_midi(model, char2idx, idx2char, init_text="", seq_len=256, k=3, layer_idx=-2, override={}):
-    # Add front and end pad to the initial text
-    init_text = preprocess_sentence(init_text)
+def generate_midi(model, char2idx, idx2char, init_text="", seq_len=256, k=3):
+
     input_sequence_ids, last_prediction = process_init_text(
         model, 
         char2idx, 
