@@ -7,7 +7,7 @@ from tensorflow.keras import layers, Model
 
 import midi_encoder as me
 
-# Directory where the checkpoints will be saved
+# Directory for checkpoint
 TRAIN_DIR = "./trained"
 
 class PositionalEncoding(layers.Layer):
@@ -17,17 +17,14 @@ class PositionalEncoding(layers.Layer):
     def __init__(self, sequence_length, vocab_size, embed_dim, **kwargs):
         super(PositionalEncoding, self).__init__(**kwargs)
         self.token_embeddings = layers.Embedding(vocab_size, embed_dim)
-        # Use the max sequence length to size the positional embedding layer
         self.position_embeddings = layers.Embedding(sequence_length, embed_dim)
 
     def call(self, inputs):
-        # inputs shape is (Batch_Size, T)
-        
+
         # 1. Get the actual sequence length (T) of the CURRENT input
         sequence_length = tf.shape(inputs)[-1] 
         
         # 2. Get the position indices: 0, 1, 2, ..., T-1
-        # IMPORTANT: Use the current input's length (T) here.
         current_positions = tf.range(start=0, limit=sequence_length, delta=1)
 
         # Get embeddings
@@ -37,7 +34,6 @@ class PositionalEncoding(layers.Layer):
         embedded_positions = self.position_embeddings(current_positions)
         
         # Add them together
-        # Note: If T=100, embedded_tokens is (B, 100, D) and embedded_positions is (100, D). This broadcasts correctly.
         return embedded_tokens + embedded_positions
 
 
@@ -60,12 +56,9 @@ class TransformerDecoderBlock(layers.Layer):
 
     def call(self, inputs, training=False):
 
-        # padding_mask = tf.expand_dims(tf.cast(tf.equal(inputs, 0), tf.bool), axis=1) # Shape: (B, 1, T)
-
         attn_output = self.att(
             inputs,
             inputs,
-            #attention_mask=padding_mask, 
             use_causal_mask=True,
             training=training
         )
@@ -91,7 +84,6 @@ def build_transformer_model(
         num_heads,
         ff_dim,
         num_blocks,
-        batch_size,
         dropout=0.1,
 ):
     """
@@ -100,19 +92,16 @@ def build_transformer_model(
     # The input layer must *not* be batch_shape-specified for flexible inference later.
     inputs = layers.Input(shape=(None,), dtype=tf.int32)
     
-    # 1. Positional Encoding
+    # Positional Encoding
     x = PositionalEncoding(seq_length, vocab_size, embed_dim)(inputs)
     x = layers.Dropout(dropout)(x)
 
-    # 2. Stacked Transformer Decoder Blocks
+    # Transformer Decoder Blocks
     for _ in range(num_blocks):
         x = TransformerDecoderBlock(embed_dim, num_heads, ff_dim, dropout_rate=dropout)(x)
 
-    # 3. Final Prediction
-    # We could use transpose of embedding weights for efficiency
+    # Dense
     outputs = layers.Dense(vocab_size)(x)
-    
-    # Use Model class for custom layers
     model = Model(inputs=inputs, outputs=outputs)
     return model
 
@@ -128,9 +117,9 @@ def train_generative_model(model, train_dataset, test_dataset, epochs, learning_
     return model.fit(
         train_dataset,
         epochs=epochs,
-        steps_per_epoch=100,
+        steps_per_epoch=1000,
         validation_data=test_dataset,
-        validation_steps=100,
+        validation_steps=1000,
         callbacks=[checkpoint_callback],
     )
 
@@ -148,14 +137,9 @@ def build_char2idx(train_vocab, test_vocab):
     # Merge train and test vocabulary
     vocab = list(train_vocab | test_vocab)
     vocab.sort()
-
-    # Calculate vocab size
     vocab_size = len(vocab)
-
-    # Create dict to support char to index conversion
     char2idx = { char:i for i,char in enumerate(vocab) }
 
-    # Save char2idx encoding as a json file for generate midi later
     with open(os.path.join(TRAIN_DIR, "char2idx.json"), "w") as f:
         json.dump(char2idx, f)
 
@@ -186,11 +170,8 @@ if __name__ == "__main__":
     parser.add_argument('--drop', type=float, default=0.1, help="Dropout.")
     opt = parser.parse_args()
 
-    # 1. Encode midi files as text with vocab
     train_text, train_vocab = me.load(opt.train)
     test_text, test_vocab = me.load(opt.test)
-
-    # 2. Build dictionary to map from char to integers
     char2idx, vocab_size = build_char2idx(train_vocab, test_vocab)
 
     print(f"\n--- Data Check ---")
@@ -199,12 +180,9 @@ if __name__ == "__main__":
     if vocab_size == 0:
         raise ValueError("Vocabulary size is 0. Check your MIDI files and 'me.load()' function.")
 
-    # 3. Build dataset from encoded unlabelled midis
     train_dataset = build_dataset(train_text, char2idx, opt.seqlen, opt.batch)
     test_dataset = build_dataset(test_text, char2idx, opt.seqlen, opt.batch)
 
-    # 4. Build Transformer model (Replaces build_generative_model)
-    # The 'units' and 'layers' LSTM arguments are replaced by 'embed', 'heads', 'ffdim', and 'blocks'
     transformer_model = build_transformer_model(
         vocab_size=vocab_size,
         seq_length=opt.seqlen,
@@ -212,17 +190,12 @@ if __name__ == "__main__":
         num_heads=opt.heads,
         ff_dim=opt.ffdim,
         num_blocks=opt.blocks,
-        batch_size=opt.batch,
         dropout=opt.drop
     )
 
     if opt.model:
-        # If pre-trained model was given as argument, load weights from disk
         print("Loading weights...")
-        # Use tf.train.latest_checkpoint for TensorFlow format checkpoints
         transformer_model.load_weights(tf.train.latest_checkpoint(opt.model))
     
     print(transformer_model.summary())
-
-    # 5. Train model
     history = train_generative_model(transformer_model, train_dataset, test_dataset, opt.epochs, opt.lrate)

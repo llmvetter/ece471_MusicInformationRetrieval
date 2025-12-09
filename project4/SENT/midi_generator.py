@@ -37,8 +37,8 @@ def generate_midi(
     char2idx,
     idx2char,
     init_text="",
-    seq_len=256,  # Max length the model was trained with
-    gen_len=255,  # Desired total output length
+    seq_len=256,
+    gen_len=255,
     k=3,
 ):
 
@@ -53,26 +53,14 @@ def generate_midi(
     
     for i in range(num_generate):
 
-        # 🛑 CRITICAL CHANGE 1: Truncate the input sequence
-        # Only keep the last 'seq_len' tokens to feed the model.
-        # This prevents the Positional Embedding index error.
+        # Truncate the input sequence - sliding window
         current_input = midi_generated_ids[-seq_len:] 
-        
-        # Build the tensor from the *truncated* sequence
         input_tensor = tf.expand_dims(current_input, 0)
-        
-        # Get predictions from the model using the truncated sequence
         predictions = model(input_tensor, training=False)
-        
-        # Get the logits for the *last* token in the current_input (which is the prediction for the next token)
+
+        # Get the logits for the *last* token in the current_input
         last_prediction = predictions[:, -1, :] 
-        
-        # Sample the next token
         predicted_id = sample_next(last_prediction, int(k))
-        
-        # 🛑 CRITICAL CHANGE 2: Append the predicted ID to the *full* sequence list
-        # We append to midi_generated_ids to track the full generated text, 
-        # but only use the truncated version for the *model input*.
         midi_generated_ids.append(predicted_id)
 
         if idx2char[predicted_id] == "\n":
@@ -115,8 +103,8 @@ if __name__ == "__main__":
         num_heads=opt.heads,
         ff_dim=opt.ffdim,
         num_blocks=opt.blocks,
-        batch_size=1, # Fixed batch size for generation
-        dropout=0.1 # Default value
+        batch_size=1,
+        dropout=0.1,
     )
     weights_path = os.path.join(TRAIN_DIR, "transformer_ckpt.weights.h5")
     transformer_model.load_weights(weights_path)
