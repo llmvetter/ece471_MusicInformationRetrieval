@@ -103,7 +103,6 @@ if __name__ == "__main__":
         num_heads=opt.heads,
         ff_dim=opt.ffdim,
         num_blocks=opt.blocks,
-        batch_size=1,
         dropout=0.1,
     )
     weights_path = os.path.join(TRAIN_DIR, "transformer_ckpt.weights.h5")
