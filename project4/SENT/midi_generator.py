@@ -32,7 +32,15 @@ def process_init_text(model, init_text, char2idx):
     last_prediction = predictions[:, -1, :]
     return input_eval, last_prediction
 
-def generate_midi(model, char2idx, idx2char, init_text="", seq_len=256, k=3):
+def generate_midi(
+        model,
+        char2idx,
+        idx2char,
+        init_text="",
+        seq_len=256,
+        gen_len=255,
+        k=3,
+):
 
     input_sequence_ids, last_prediction = process_init_text(
         model = model, 
@@ -41,7 +49,8 @@ def generate_midi(model, char2idx, idx2char, init_text="", seq_len=256, k=3):
     )
 
     midi_generated_ids = input_sequence_ids.copy()
-    for i in range(seq_len):
+    num_generate = gen_len - len(input_sequence_ids)
+    for i in range(num_generate):
 
             predicted_id = sample_next(last_prediction, int(k))
             midi_generated_ids.append(predicted_id)
@@ -67,6 +76,7 @@ if __name__ == "__main__":
     parser.add_argument('--seqinit', type=str, default="<START>", help="Sequence init.")
     parser.add_argument('--seqlen', type=int, default=256, help="Sequence lenght.") 
     parser.add_argument('--topk', type=int, default=10, help="Top k to sample from during generation.")
+    parser.add_argument('--gen_len', type=int, default=500, help="The desired total number of tokens to generate.")
     opt = parser.parse_args()
 
     # Load char2idx dict from json file
@@ -98,6 +108,7 @@ if __name__ == "__main__":
         idx2char, 
         opt.seqinit, 
         opt.seqlen, 
+        opt.gen_len,
         opt.topk
     )
     print(midi_txt)
