@@ -6,7 +6,6 @@ import tensorflow as tf
 import midi_encoder as me
 
 from train_transformer import build_transformer_model
-from train_classifier import preprocess_sentence
 
 GENERATED_DIR = './generated'
 TRAIN_DIR = "./trained"
