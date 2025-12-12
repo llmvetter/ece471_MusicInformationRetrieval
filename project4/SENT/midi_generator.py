@@ -82,7 +82,7 @@ if __name__ == "__main__":
     parser.add_argument('--seqinit', type=str, default="<START>", help="Sequence init.")
     parser.add_argument('--seqlen', type=int, default=256, help="Sequence lenght.") 
     parser.add_argument('--topk', type=int, default=10, help="Top k to sample from during generation.")
-    parser.add_argument('--temp', type=float, defeault=1, help="Temperatur scaling parameters for sampling process.")
+    parser.add_argument('--temp', type=float, default=1, help="Temperatur scaling parameters for sampling process.")
     parser.add_argument('--gen_len', type=int, default=500, help="The desired total number of tokens to generate.")
     opt = parser.parse_args()
 
