@@ -40,6 +40,7 @@ def generate_midi(
     seq_len=256,
     gen_len=255,
     k=3,
+    temp=1.0,
 ):
 
     input_sequence_ids, last_prediction = process_init_text(
@@ -60,7 +61,7 @@ def generate_midi(
 
         # Get the logits for the *last* token in the current_input
         last_prediction = predictions[:, -1, :] 
-        predicted_id = sample_next(last_prediction, int(k))
+        predicted_id = sample_next(last_prediction, int(k), temp)
         midi_generated_ids.append(predicted_id)
 
         if idx2char[predicted_id] == "\n":
@@ -82,6 +83,7 @@ if __name__ == "__main__":
     parser.add_argument('--seqinit', type=str, default="<START>", help="Sequence init.")
     parser.add_argument('--seqlen', type=int, default=256, help="Sequence lenght.") 
     parser.add_argument('--topk', type=int, default=10, help="Top k to sample from during generation.")
+    parser.add_argument('--temp', type=float, defeault=1, help="Temperatur scaling parameters for sampling process.")
     parser.add_argument('--gen_len', type=int, default=500, help="The desired total number of tokens to generate.")
     opt = parser.parse_args()
 
@@ -114,7 +116,8 @@ if __name__ == "__main__":
         opt.seqinit, 
         opt.seqlen, 
         opt.gen_len,
-        opt.topk
+        opt.topk,
+        opt.temp,
     )
     print(midi_txt)
 
