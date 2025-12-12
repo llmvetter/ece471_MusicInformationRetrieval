@@ -100,6 +100,7 @@ if __name__ == "__main__":
     parser.add_argument('--cellix', type=int, default=-2, help="LSTM layer to use as encoder.")
     parser.add_argument('--override', type=str, default="", help="JSON file with neuron values to override.")
     parser.add_argument('--topk', type=str, default=10, help="Top k to sample from during generation.")
+    parser.add_argument('--gen_len', type=int, default=230, help="The desired total number of tokens to generate.")
     opt = parser.parse_args()
 
     # Load char2idx dict from json file
