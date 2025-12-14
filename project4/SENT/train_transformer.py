@@ -192,7 +192,7 @@ if __name__ == "__main__":
 
     if opt.model:
         print("Loading weights...")
-        transformer_model.load_weights(tf.train.latest_checkpoint(opt.model))
+        transformer_model.load_weights(opt.model)
     
     print(transformer_model.summary())
     history = train_generative_model(transformer_model, train_dataset, test_dataset, opt.epochs, opt.lrate)
