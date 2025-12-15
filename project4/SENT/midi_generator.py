@@ -84,40 +84,46 @@ if __name__ == "__main__":
     parser.add_argument('--topk', type=int, default=10, help="Top k to sample from during generation.")
     parser.add_argument('--temp', type=float, default=1, help="Temperatur scaling parameters for sampling process.")
     parser.add_argument('--gen_len', type=int, default=500, help="The desired total number of tokens to generate.")
+    parser.add_argument('--input_tokens', type=str, default=None, help="Path to a .txt file")
     opt = parser.parse_args()
 
-    # Load char2idx dict from json file
-    with open(opt.ch2ix) as f:
-        char2idx = json.load(f)
+    if opt.input_tokens is not None:
 
-    # Create idx2char from char2idx dict
-    idx2char = {idx:char for char,idx in char2idx.items()}
+            with open(opt.input_tokens, 'r') as f:
+                midi_txt = f.read().strip()
+    else:
+        with open(opt.ch2ix) as f:
+            char2idx = json.load(f)
 
-    # Calculate vocab_size from char2idx dict
-    vocab_size = len(char2idx)
+        # Create idx2char from char2idx dict
+        idx2char = {idx:char for char,idx in char2idx.items()}
 
-    # Rebuild model from checkpoint
-    transformer_model = build_transformer_model(
-        vocab_size=vocab_size,
-        seq_length=opt.seqlen,
-        embed_dim=opt.embed,
-        num_heads=opt.heads,
-        ff_dim=opt.ffdim,
-        num_blocks=opt.blocks,
-        dropout=0.1,
-    )
-    weights_path = os.path.join(TRAIN_DIR, "transformer_ckpt.weights.h5")
-    transformer_model.load_weights(weights_path)
-    midi_txt = generate_midi(
-        transformer_model, 
-        char2idx, 
-        idx2char, 
-        opt.seqinit, 
-        opt.seqlen, 
-        opt.gen_len,
-        opt.topk,
-        opt.temp,
-    )
+        # Calculate vocab_size from char2idx dict
+        vocab_size = len(char2idx)
+
+        # Rebuild model from checkpoint
+        transformer_model = build_transformer_model(
+            vocab_size=vocab_size,
+            seq_length=opt.seqlen,
+            embed_dim=opt.embed,
+            num_heads=opt.heads,
+            ff_dim=opt.ffdim,
+            num_blocks=opt.blocks,
+            dropout=0.1,
+        )
+        weights_path = os.path.join(TRAIN_DIR, "transformer_ckpt.weights.h5")
+        transformer_model.load_weights(weights_path)
+        midi_txt = generate_midi(
+            transformer_model, 
+            char2idx, 
+            idx2char, 
+            opt.seqinit, 
+            opt.seqlen, 
+            opt.gen_len,
+            opt.topk,
+            opt.temp,
+        )
+
     print(midi_txt)
 
     me.write(midi_txt, os.path.join(GENERATED_DIR, "generated.mid"))
