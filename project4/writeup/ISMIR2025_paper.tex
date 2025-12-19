@@ -155,65 +155,102 @@ Where $d_k$ is the embedding dimension which we set to 128. We using 8 attention
 Network size of 512 and a sequence length (attention window size) of 256 tokens. This proposed architecture 
 yields a model with approximately 1.7M trainable parameters.
 
-
 \subsection{Training}\label{subsec:training}
 The model was trained on the combined corpus using a cross-entropy loss function. We monitored 
 training progress by inspecting generated sequences at various intervals to distinguish between 
 chaotic "noise" and structured "music". We trained our model using the A100 GPU backend provided by 
 Google Colab. Training was conducted using different hyperparameter configurations for the model
 architecture as well as for the training subset.
+
+
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.85\columnwidth]{loss_curve.png}%
+    \caption{Training loss and validation curve. Both loss and validation plateau after 15 epoch.}
+    \label{fig:loss-graph}
+\end{figure}
+
 We tried training on smaller subsets of the data, as well as scaling the dataset up to more than 17M
 tokens by employing techniques like time stretching, making each piece up to $5\%$ faster or slower
 and transposition where lowering or raising the pitch of each piece by up to a major third will 
 produce another training sample.
 
 \section{Results}\label{sec:results}
-To be done.
+The loss curve in Figure~\ref{fig:loss-graph} shows that training loss decreased from 6.8 to 3.6 and validation loss also decreased from 6.4 to 3.5 after 15 epoch of training.
+This indicates that model successfully learned the features of dataset and model was neither overfitted nor underfitted.
 
-\subsection{Figures, Tables and Captions}
-Include at least one table to display the results and \textbf{Graph of the Model Architecture}
-
-Before training, the model produced random distributions of tokens 
-(e.g., $t_120 v_56 d_whole_0 n_40 w_1599...$). After training, the output shifted 
-toward valid musical syntax, correctly sequencing tempo ($t$), velocity ($v$), 
-duration ($d$), and note ($n$) tokens (e.g., $t_120 v_56 d_eighth_0 v_60 d_quarter_0 n_79$).
-
-To evaluate the structural consistency of the generated music, we measured the Structural Cosine Similarity across different n-gram levels:
-
-\begin{table}
+\begin{table}[t]
   \centering
-  \begin{tabular}{|l|l|}
+  \begin{tabular}{|c|c|}
     \hline
-    String value & Numeric value \\
+    \textbf{n-gram level} & \textbf{Structural Cosine Similarity} \\
     \hline
-    Hello ISMIR  & \conferenceyear \\
+    2-gram & 0.0286 \\
+    3-gram & 0.0185 \\
+    4-gram & 0.0011 \\
     \hline
   \end{tabular}
-  \caption{Table captions should be placed below the table.}
-  \label{tab:example}
+  \caption{Structural cosine similarity between generated sequences and reference music before training.}
+  \label{tab:scs-before}
 \end{table}
 
+\begin{table}[t]
+  \centering
+  \begin{tabular}{|c|c|}
+    \hline
+    \textbf{n-gram level} & \textbf{Structural Cosine Similarity} \\
+    \hline
+    2-gram & 0.8994 \\
+    3-gram & 0.8065 \\
+    4-gram & 0.7128 \\
+    \hline
+  \end{tabular}
+  \caption{Structural cosine similarity between generated sequences and reference music after training.}
+  \label{tab:scs-after}
+\end{table}
+
+
+\subsection{Generating Songs}
+
+During generation, we introduce a \texttt{--seqinit} parameter that constrains the model to begin each sequence with a predefined set of tokens.
+This mechanism provides the model with an explicit musical context at generation time and allows controlled similarity to a reference piece by modifying the initial token sequence.
+
+Prior to training, the model produces near-random token distributions that lack musical coherence (e.g., \texttt{t\_120 v\_56 d\_whole\_0 n\_40 w\_1599}). 
+After training, the generated output adheres to valid symbolic music syntax, consistently ordering tempo ($t$), velocity ($v$), duration ($d$), and note ($n$) tokens (e.g., \texttt{t\_120 v\_56 d\_eighth\_0 v\_60 d\_quarter\_0 n\_79}), indicating that the model has learned basic structural constraints of the representation.
+
+To quantitatively evaluate structural consistency, we compute the Structural Cosine Similarity between generated sequences and a reference piece across multiple $n$-gram levels. 
+As shown in Table~\ref{tab:scs-before}, untrained generations exhibit negligible structural similarity at all $n$-gram orders, reflecting the absence of learned musical dependencies. 
+In contrast, Table~\ref{tab:scs-after} demonstrates a substantial increase in similarity after training, with consistently high scores across 2-gram to 4-gram levels. 
+
+This trend suggests that the transformer effectively captures local and mid-range structural patterns in symbolic music, contributing to more coherent musical sequences.
+
+
 \section{Discussion and Error Analysis}
-The transition from LSTM to Transformer addressed the "quality" bottleneck. However, the error analysis
-reveals that the model still struggles with:
 
-Metric Consistency: Occasionally skipping beats or losing the 4/4 time signature.
-Harmonic Logic: While individual notes are correctly formatted, the global harmonic progression 
-sometimes lacks a clear tonal center. The results confirm that the Transformer is less prone 
-to the "unraveling" seen in LSTMs but requires even more data or more refined conditioning 
-(like the emotion labels in EMOPIA) to reach professional-level composition.
+While the Structural Cosine Similarity shows clear evidence that the model is learning, the quality of the generated music was extremely low. Since the metrics indicated that this issue did not originate from the training stage, we conducted an error analysis at an earlier data processing stage.
 
-\begin{thebibliography}{citations}
-\bibitem{emopia} H.-T. Hung, J. Ching, S. Doh, N. Kim, J. Nam, and Y.-H. Yang, ``EMOPIA: A Multi-Modal Pop Piano Dataset For Emotion Recognition and Emotion-based Music Generation,'' \textit{arXiv preprint arXiv:2108.01374}, 2021.
-\bibitem{vgmidi} L. N. Ferreira and J. Whitehead, ``Learning to generate music with sentiment,'' in \textit{Proc. 20th Int. Soc. Music Inf. Retrieval Conf. (ISMIR)}, 2019.
-\bibitem{compoundword}W.-Y. Hsiao, J.-Y. Liu, Y.-C. Yeh, and Y.-H. Yang, ``Compound Word Transformer: Learning to Compose Full-Song Music over Dynamic Directed Hypergraphs,'' \textit{CoRR}, vol. abs/2101.02402, 2021. [Online]. Available: https://arxiv.org/abs/2101.02402
-\bibitem{morpheus} D. Herremans and E. Chew, ``MorpheuS: generating structured music with constrained patterns and tension,'' \textit{CoRR}, vol. abs/1812.04832, 2018. [Online]. Available: https://arxiv.org/abs/1812.04832
-\bibitem{davis2014}H. Davis and S. M. Mohammad, ``Generating Music from Literature,'' \textit{CoRR}, vol. abs/1403.2124, 2014. [Online]. Available: https://arxiv.org/abs/1403.2124
-\bibitem{Scirea} Scirea M., Togelius J., Eklund P., Risi S., (2017). Affective evolutionary music composition with MetaCompose. Genetic Programming and Evolvable Machines. 18. 1-33. 10.1007/s10710-017-9307-y. 
-\bibitem{Oore2017} S. Oore, I. Simon, S. Dieleman, and D. Eck, ``Learning to Create Piano Performances,'' in \textit{Proc. NIPS Workshop Machine Learn. Creativity}, Long Beach, CA, USA, 2017.
-\bibitem{Huang2020} Y.-S. Huang and Y.-H. Yang, ``Pop Music Transformer: Beat-based Modeling and Generation of Expressive Pop Piano Compositions,'' in \textit{Proc. 28th ACM Int. Conf. Multimedia (MM '20)}, New York, NY, USA, 2020, pp. 1180--1188. doi: 10.1145/3394171.3413671.
-\bibitem{Ji2023} Ji, Shulei et al. “A Survey on Deep Learning for Symbolic Music Generation: Representations, Algorithms, Evaluations, and Challenges.” ACM Computing Surveys 56 (2023): 1 - 39.
-\bibitem{Hawthorne2017} C. Hawthorne \textit{et al.}, ``Onsets and Frames: Dual-Objective Piano Transcription,'' \textit{CoRR}, vol. abs/1710.11153, 2017. [Online]. Available: https://arxiv.org/abs/1710.11153
-\end{thebibliography}
+To verify whether the encoder and decoder used in data processing were functioning correctly, we first encoded a piece of music from one of the datasets into its symbolic representation and then decoded it back into a MIDI file. 
+Theoretically, if both the encoder and decoder are implemented correctly, this process should reproduce the same music as the reference piece.
+
+However, the generated output was only approximately 3 seconds long and sounded entirely different from the original song. 
+To further isolate the possibility of dataset corruption, we implemented an alternative encoder and decoder using miditok, a Python package for MIDI file tokenization \cite{miditok}. 
+When the same error analysis procedure was performed using the miditok encoder and decoder, the reconstruction worked correctly and reproduced the original song.
+
+This result clearly indicates that the source of the error lies in the encoder and decoder implementation based on \cite{vgmidi}.
+\begin{itemize}
+  \item \textbf{Metric Consistency}: Occasionally skipping beats or losing the 4/4 time signature.
+  \item \textbf{Harmonic Logic}: While individual notes are correctly formatted, the global harmonic progression 
+  sometimes lacks a clear tonal center.
+\end{itemize}
+
+The results confirm that the Transformer is less prone to the ``unraveling'' seen in LSTMs but requires 
+even more data or more refined conditioning (such as the emotion labels in EMOPIA) to reach 
+professional-level composition.
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
 
 \end{document}
