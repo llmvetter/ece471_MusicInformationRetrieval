@@ -72,8 +72,8 @@ Ferreira and Whitehead \cite{vgmidi} utilized a single-layer multiplicative Long
 network with 4,096 units. This model was trained as a generative language model to predict the 
 next musical "word" in a custom 225-token vocabulary representing pitch, duration, velocity, and tempo. 
 However, they noted that the produced music often exhibited structural inconsistency. 
-This shows that while recurrent models like LSTM are able to model long range dependencies,
-in practise, these models are struggle to maintain coherence. 
+This shows that while in theory recurrent models like LSTM are able to model long range dependencies,
+these models are struggle to maintain coherence in practise.
 
 Inspired by recent advances in NLP, Transformer-based models seem to be excellent at long range 
 sequence modelling. This observation serves as the primary catalyst for the transition to 
@@ -102,10 +102,11 @@ further optimizes sequence length and computational efficiency \cite{compoundwor
 related tokens (e.g., pitch, duration, and velocity) are grouped into a single "super token" or 
 compound word at each time step which reduces the total vocabulary size thus enabling the Transformer to
 attend to longer sequences, yielding better musical structure and model training properties. 
+Our work adopts the encoding scheme proposed in \cite{vgmidi} utilizing \texttt{pitch},
+\texttt{duration}, \texttt{velocity} and \texttt{tempo} tokens. We chose this approach for 
+it's more simplistic design when compared to more complex tokenization schemes. 
 
-Our work adopts the encoding scheme proposed in \cite{vgmidi}. We chose this approach for it's more 
-simplistic design when compared to more complex tokenization schemes. It can therefore be concluded that 
-our work contributes the following to the research community:
+It can therefore be concluded that  our work contributes the following to the research community:
 
 \begin{itemize}
   \item Combined dataset of piano music
@@ -113,26 +114,25 @@ our work contributes the following to the research community:
   \item evaluation of produced music
 \end{itemize}
 
-\section{Body}
-To be done.
+\section{Data}\label{subsec:data}
+We combine three commonly used datasets piano datasets in order to increase the training data size.
+The EMOPIA dataset \cite{emopia} provides a multi-modal (audio/MIDI) foundation for emotion-labeled pop piano.
+It is composed of 1087 music clips from 387 songs transcribed from YouTube, encompassing a 
+diverse set of playing styles and high musical quality. This dataset contributes 480.335 tokens 
+to the final datamix.
 
-\subsection{Data}\label{subsec:data}
-Datasets
-The EMOPIA dataset \cite{emopia} provides a multi-modal (audio/MIDI) foundation for emotion-labeled pop piano. 
-The VGMIDI dataset offers video game music \, while the Pop1K7 dataset [Hsiao et al., 2021] provides a large-scale repository of pop piano transcriptions from YouTube.
-We use three different datasets in combination to train our model. We utilize the EMOPIA dataset which contains
-1087 music clips from 387 sings [cite]. We further utilize the pop1k
-
-• The Pop1K7 dataset developed by W.-Y. Hsiao et al. (2021)4
-is composed of machine
-transcriptions of 1,747 audio recordings of piano covers (i.e., a new recording by someone
-other than the original artist or composer of a commercially released song) of Japanese
-anime, Korean and Western pop music, amounting to over 100 hours worth of data. The
+The Pop1K7 dataset \cite{compoundword} is composed of machine transcriptions of 1,747 audio recordings of 
+piano covers of Japanese anime, Korean and Western pop music, amounting to over 100 hours worth of data. The
 transcription was done with the “onsets-and-frames” RNN-based piano transcription model
-(Hawthorne et al., 2018) (which is reported to attain 95.32 onset F1 score for note-level piano
-transcription (Hawthorne et al., 2021)), and the RNN-based downbeat and beat tracking
-model from the Madmom library (Böck et al., 2016). This dataset is the largest among the
-five, constituting half of our training data. We only use it for pre-training.
+\cite{Hawthorne2017}. This dataset is the largest among the three contributing 1.577.835 
+tokens to the final data mix.
+
+The VGMIDI \cite{vgmidi} is composed of 728 pieces extracted from video game soundtracks. 
+All the pieces are piano arrangements of the soundtracks and vary in length from 26 seconds 
+to 3 minutes. This dataset is the smallest among the three, contributing 202.030 tokens to 
+the final data mix.
+
+Consequently, the final combined dataset constitutes 2.25M tokens of transcribed piano music.
 
 \subsection{Proposed Method}\label{subsec:data_prep}
 We adopt a vocabulary of $n=1,350$ tokens. The data preprocessing pipeline treats music modeling as a 
@@ -215,6 +215,7 @@ to the "unraveling" seen in LSTMs but requires even more data or more refined co
 \bibitem{Oore2017} S. Oore, I. Simon, S. Dieleman, and D. Eck, ``Learning to Create Piano Performances,'' in \textit{Proc. NIPS Workshop Machine Learn. Creativity}, Long Beach, CA, USA, 2017.
 \bibitem{Huang2020} Y.-S. Huang and Y.-H. Yang, ``Pop Music Transformer: Beat-based Modeling and Generation of Expressive Pop Piano Compositions,'' in \textit{Proc. 28th ACM Int. Conf. Multimedia (MM '20)}, New York, NY, USA, 2020, pp. 1180--1188. doi: 10.1145/3394171.3413671.
 \bibitem{Ji2023} Ji, Shulei et al. “A Survey on Deep Learning for Symbolic Music Generation: Representations, Algorithms, Evaluations, and Challenges.” ACM Computing Surveys 56 (2023): 1 - 39.
+\bibitem{Hawthorne2017} C. Hawthorne \textit{et al.}, ``Onsets and Frames: Dual-Objective Piano Transcription,'' \textit{CoRR}, vol. abs/1710.11153, 2017. [Online]. Available: https://arxiv.org/abs/1710.11153
 \end{thebibliography}
 
 \end{document}
