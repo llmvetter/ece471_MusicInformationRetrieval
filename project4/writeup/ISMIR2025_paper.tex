@@ -1,0 +1,159 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{ismir} % Remove the "submission" option for camera-ready version
+\usepackage{amsmath,cite,url}
+\usepackage{graphicx}
+\usepackage{color}
+
+
+% Title. Please use IEEE-compliant title case when specifying the title here,
+% as it has implications for the copyright notice
+% ------
+\title{Transformer Based Symbolic Music Generation}
+
+% Two addresses
+% --------------
+\twoauthors
+   {Wongee Hong} {The Cooper Union \\ Albert Nerken School of Engineering}
+   {Lennart Vetter} {The Cooper Union \\ Albert Nerken School of Engineering}
+
+\def\authorname{W. Hong, and L. Vetter}
+
+\sloppy % please retain sloppy command for improved formatting
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This work addresses the limitations of recurrent architectures and small-scale datasets in 
+symbolic music generation. Building upon previous attempts to steer music generation through Genetic Evolution
+Algorithms (GEA) on LSTMs—which yielded suboptimal results in musical coherence—we propose a transition 
+to a Transformer-based architecture. By aggregating three distinct datasets (VGMIDI, EMOPIA, and Pop1K7), 
+we train a decoder-only Transformer on a large-scale corpus of approximately X million tokens. 
+Our model employs a vocabulary of 1,350 unique tokens to represent melody and harmony. 
+Preliminary results indicate that while the model learns basic structural dependencies, as 
+evidenced by n-gram structural cosine similarity metrics, the transition from LSTM to Transformer 
+significantly improves the stability of the generated musical sequences.
+\end{abstract}
+
+\section{Introduction}\label{sec:introduction}
+Symbolic music generation has evolved from rule-based systems to sophisticated deep generative models capable 
+of capturing complex polyphonic structures \cite{compoundword}. However, two primary challenges persist: 
+the effective modeling of long-range dependencies in full-song compositions and the effective training 
+on large scale datasets. 
+Previous work \cite{vgmidi} attempted to use Long Short-Term Memory (LSTM) networks trained on the 
+VGMIDI dataset, employing a Genetic Evolution Algorithm to steer output towards specific sentiments. 
+However, these autoregressive models like LSTM and RNNs often suffered from "drift," where the lack of 
+long-range attention led to a loss of structural integrity due to vanishing gradient signals 
+during backpropagation in time for long sequences [CITATION NEEDED] thus yielding music pieces with incoherent 
+strucutre.
+
+In this project, we test the hypothesis that music generation is essentially a data-hungry task that 
+requires high-capacity architectures capable of modeling global dependencies. We pivot from LSTMs to a 
+Transformer architecture and expand our training data by a factor of 10, incorporating the EMOPIA and 
+Pop1K7 datasets. We focus on the "quality-first" approach: establishing a baseline of high-quality music 
+generation first and leaving the integration of sentiment steering up to further research.
+
+\section{Related Work}
+
+Symbolic Representations 
+Standard MIDI-like representations treat every musical event (Note-On, Note-Off, Time-Shift) as a separate token. 
+The REMI (REvamped MIDI) representation improved this by introducing metrical tokens like "Bar" and "Position" 
+to provide a clear metric grid.
+
+Transformer Models: The Music Transformer introduced relative attention to better capture periodicities. 
+Subsequent models like MuseNet and Pop Music Transformer have applied these to diverse genres but often treat all 
+token types equally in the embedding space. Recent surveys \cite{Ji} highlight the shift from 
+RNNs to self-attention mechanisms, noting that Transformers better capture the periodic and 
+hierarchical nature of music.
+
+\section{Body}
+To be done.
+
+\subsection{Data}\label{subsec:data}
+Datasets
+The EMOPIA dataset \cite{emopia} provides a multi-modal (audio/MIDI) foundation for emotion-labeled pop piano. 
+The VGMIDI dataset offers video game music \, while the Pop1K7 dataset [Hsiao et al., 2021] provides a large-scale repository of pop piano transcriptions from YouTube.
+We use three different datasets in combination to train our model. We utilize the EMOPIA dataset which contains
+1087 music clips from 387 sings [cite]. We further utilize the pop1k
+
+\subsection{Proposed Method}\label{subsec:data_prep}
+We adopt a vocabulary of $n=1,350$ tokens. The data preprocessing pipeline treats music modeling as a 
+language modeling task. Musical events are encoded into features representing melody and harmony. 
+Following the encoding scheme presented by \cite{emopia}, we use tokens representing pitch, 
+duration, velocity or bar and position.
+
+\subsection{Model Architecture}\label{subsec:model}
+We utilize a decoder-only Transformer. The input to the model at time $t$ is a projected embedding of 
+the music token. The architecture consists of multiple self-attention layers that 
+compute:$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+
+Where $d_k$ is the dimension of the key vectors. The model predicts the next music token word by 
+employing multi-headed attention.
+
+\section{Experimental Setup}\label{subsec:setup}
+
+\subsection{Datasets}
+We combine three primary datasets to overcome the "data-hungry" nature of Transformer models:
+
+VGMIDI: 728 MIDI files (~202,030 tokens).
+
+EMOPIA: 1,087 MIDI files (~480,335 tokens).
+
+Pop1K7: 1,700 MIDI files (~1,577,835 tokens).
+
+Total Corpus: 3,515 MIDI files, totaling approximately 2,260,200 tokens. We also experiment with transposition
+and stretching of the dataset to further increase the training dataset size. The largest training dataset
+used in the experiments totaled X M tokens.
+
+
+\subsection{Training}\label{subsec:training}
+The model was trained on the combined corpus using a cross-entropy loss function. We monitored 
+training progress by inspecting generated sequences at various intervals to distinguish between 
+chaotic "noise" and structured "music."
+
+\section{Results}\label{sec:results}
+To be done.
+
+\subsection{Figures, Tables and Captions}
+Include at least one table to display the results and \textbf{Graph of the Model Architecture}
+
+Before training, the model produced random distributions of tokens 
+(e.g., $t_120 v_56 d_whole_0 n_40 w_1599...$). After training, the output shifted 
+toward valid musical syntax, correctly sequencing tempo ($t$), velocity ($v$), 
+duration ($d$), and note ($n$) tokens (e.g., $t_120 v_56 d_eighth_0 v_60 d_quarter_0 n_79$).
+
+To evaluate the structural consistency of the generated music, we measured the Structural Cosine Similarity across different n-gram levels:
+
+\begin{table}
+  \centering
+  \begin{tabular}{|l|l|}
+    \hline
+    String value & Numeric value \\
+    \hline
+    Hello ISMIR  & \conferenceyear \\
+    \hline
+  \end{tabular}
+  \caption{Table captions should be placed below the table.}
+  \label{tab:example}
+\end{table}
+
+\section{Discussion and Error Analysis}
+The transition from LSTM to Transformer addressed the "quality" bottleneck. However, the error analysis
+reveals that the model still struggles with:
+
+Metric Consistency: Occasionally skipping beats or losing the 4/4 time signature.
+Harmonic Logic: While individual notes are correctly formatted, the global harmonic progression 
+sometimes lacks a clear tonal center. The results confirm that the Transformer is less prone 
+to the "unraveling" seen in LSTMs but requires even more data or more refined conditioning 
+(like the emotion labels in EMOPIA) to reach professional-level composition.
+
+\begin{thebibliography}{citations}
+\bibitem{emopia} H.-T. Hung, J. Ching, S. Doh, N. Kim, J. Nam, and Y.-H. Yang, ``EMOPIA: A Multi-Modal Pop Piano Dataset For Emotion Recognition and Emotion-based Music Generation,'' \textit{arXiv preprint arXiv:2108.01374}, 2021.
+\bibitem{vgmidi} L. N. Ferreira and J. Whitehead, ``Learning to generate music with sentiment,'' in \textit{Proc. 20th Int. Soc. Music Inf. Retrieval Conf. (ISMIR)}, 2019.
+\bibitem{compoundword}W.-Y. Hsiao, J.-Y. Liu, Y.-C. Yeh, and Y.-H. Yang, ``Compound Word Transformer: Learning to Compose Full-Song Music over Dynamic Directed Hypergraphs,'' \textit{CoRR}, vol. abs/2101.02402, 2021. [Online]. Available: https://arxiv.org/abs/2101.02402
+\bibitem{Ji2023} Ji, Shulei et al. “A Survey on Deep Learning for Symbolic Music Generation: Representations, Algorithms, Evaluations, and Challenges.” ACM Computing Surveys 56 (2023): 1 - 39.
+\end{thebibliography}
+
+\end{document}
