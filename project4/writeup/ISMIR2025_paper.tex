@@ -102,9 +102,6 @@ further optimizes sequence length and computational efficiency \cite{compoundwor
 related tokens (e.g., pitch, duration, and velocity) are grouped into a single "super token" or 
 compound word at each time step which reduces the total vocabulary size thus enabling the Transformer to
 attend to longer sequences, yielding better musical structure and model training properties. 
-Our work adopts the encoding scheme proposed in \cite{vgmidi} utilizing \texttt{pitch},
-\texttt{duration}, \texttt{velocity} and \texttt{tempo} tokens. We chose this approach for 
-it's more simplistic design when compared to more complex tokenization schemes. 
 
 It can therefore be concluded that  our work contributes the following to the research community:
 
@@ -114,10 +111,20 @@ It can therefore be concluded that  our work contributes the following to the re
   \item evaluation of produced music
 \end{itemize}
 
-\section{Data}\label{subsec:data}
+\section{Experimental Setup}\label{subsec:data}
+
+The following sections will outline the approach we took to train our transformer architecture, the 
+compilation of the dataset we trained on. We treat 
+music modeling as a language modeling task. Musical events are encoded according to the 
+encoding scheme proposed in \cite{vgmidi} utilizing \texttt{pitch},
+\texttt{duration}, \texttt{velocity} and \texttt{tempo} tokens. We chose this approach for 
+it's more simplistic design when compared to more complex tokenization schemes. 
+This yields a vocabulary of $n=1,350$ distinct tokens.
+
+\subsection{Data}
 We combine three commonly used datasets piano datasets in order to increase the training data size.
-The EMOPIA dataset \cite{emopia} provides a multi-modal (audio/MIDI) foundation for emotion-labeled pop piano.
-It is composed of 1087 music clips from 387 songs transcribed from YouTube, encompassing a 
+The EMOPIA dataset \cite{emopia} provides a multi-modal (audio/MIDI) foundation for emotion-labeled 
+pop piano. It is composed of 1087 music clips from 387 songs transcribed from YouTube, encompassing a 
 diverse set of playing styles and high musical quality. This dataset contributes 480.335 tokens 
 to the final datamix.
 
@@ -134,40 +141,28 @@ the final data mix.
 
 Consequently, the final combined dataset constitutes 2.25M tokens of transcribed piano music.
 
-\subsection{Proposed Method}\label{subsec:data_prep}
-We adopt a vocabulary of $n=1,350$ tokens. The data preprocessing pipeline treats music modeling as a 
-language modeling task. Musical events are encoded into features representing melody and harmony. 
-Following the encoding scheme presented by \cite{emopia}, we use tokens representing pitch, 
-duration, velocity or bar and position.
-
 \subsection{Model Architecture}\label{subsec:model}
 We utilize a decoder-only Transformer. The input to the model at time $t$ is a projected embedding of 
-the music token. The architecture consists of multiple self-attention layers that 
-compute:$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+the music token. The architecture consists 2 stacked decoder blocks, each employing a self-attention 
+layer that computes: 
 
-Where $d_k$ is the dimension of the key vectors. The model predicts the next music token word by 
-employing multi-headed attention.
+$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
 
-\section{Experimental Setup}\label{subsec:setup}
-
-\subsection{Datasets}
-We combine three primary datasets to overcome the "data-hungry" nature of Transformer models:
-
-VGMIDI: 728 MIDI files (~202,030 tokens).
-
-EMOPIA: 1,087 MIDI files (~480,335 tokens).
-
-Pop1K7: 1,700 MIDI files (~1,577,835 tokens).
-
-Total Corpus: 3,515 MIDI files, totaling approximately 2,260,200 tokens. We also experiment with transposition
-and stretching of the dataset to further increase the training dataset size. The largest training dataset
-used in the experiments totaled X M tokens.
+Where $d_k$ is the embedding dimension which we set to 128. We using 8 attention heads and a Feed Forward Neural
+Network size of 512 and a sequence length (attention window size) of 256 tokens. This proposed architecture 
+yields a model with approximately 1.7M trainable parameters.
 
 
 \subsection{Training}\label{subsec:training}
 The model was trained on the combined corpus using a cross-entropy loss function. We monitored 
 training progress by inspecting generated sequences at various intervals to distinguish between 
-chaotic "noise" and structured "music."
+chaotic "noise" and structured "music". We trained our model using the A100 GPU backend provided by 
+Google Colab. Training was conducted using different hyperparameter configurations for the model
+architecture as well as for the training subset.
+We tried training on smaller subsets of the data, as well as scaling the dataset up to more than 17M
+tokens by employing techniques like time stretching, making each piece up to $5\%$ faster or slower
+and transposition where lowering or raising the pitch of each piece by up to a major third will 
+produce another training sample.
 
 \section{Results}\label{sec:results}
 To be done.
