@@ -27,46 +27,49 @@
 
 \begin{abstract}
 This work addresses the limitations of recurrent architectures and small-scale datasets in 
-symbolic music generation. Building upon previous attempts to steer music generation through Genetic Evolution
-Algorithms (GEA) on LSTMs—which yielded suboptimal results in musical coherence—we propose a transition 
-to a Transformer-based architecture. By aggregating three distinct datasets (VGMIDI, EMOPIA, and Pop1K7), 
-we train a decoder-only Transformer on a large-scale corpus of approximately X million tokens. 
+symbolic music generation. Building upon previous attempts based on LSTMs — which yielded 
+suboptimal results in musical coherence — we propose a transition to a transformer-based 
+architecture. By aggregating three distinct datasets (VGMIDI, EMOPIA, and Pop1K7), 
+we train a decoder-style transformer on a large-scale corpus of approximately 2.25M million tokens. 
 Our model employs a vocabulary of 1,350 unique tokens to represent melody and harmony. 
 Preliminary results indicate that while the model learns basic structural dependencies, as 
 evidenced by n-gram structural cosine similarity metrics, the transition from LSTM to Transformer 
-significantly improves the stability of the generated musical sequences.
+significantly improves the stability of the generated musical sequences while also pointing 
+out the need for large scale datasets to satisfy the intensive data demand of these models.
+This demonstrates the viability of employing transformer architectures for Music Generation
+in the current ubiquitous Big Data Regime.
 \end{abstract}
 
 \section{Introduction}\label{sec:introduction}
-Symbolic music generation has evolved from rule-based systems to sophisticated deep generative models capable 
-of capturing complex polyphonic structures \cite{compoundword}. However, two primary challenges persist: 
-the effective modeling of long-range dependencies in full-song compositions and the effective training 
-on large scale datasets. 
+Symbolic music generation has evolved from rule-based systems {davis2014} to sophisticated deep 
+generative models capable of capturing complex and nuanced polyphonic structures \cite{compoundword}. 
+However, two primary challenges persist: the effective modeling of long-range dependencies in 
+full-song compositions and the effective training on large scale datasets. 
 Previous work \cite{vgmidi} attempted to use Long Short-Term Memory (LSTM) networks trained on the 
-VGMIDI dataset, employing a Genetic Evolution Algorithm to steer output towards specific sentiments. 
-However, these autoregressive models like LSTM and RNNs often suffered from "drift," where the lack of 
-long-range attention led to a loss of structural integrity due to vanishing gradient signals 
-during back propagation in time for long sequences [CITATION NEEDED] thus yielding music pieces with incoherent 
-structure.
+VGMIDI dataset. However, these autoregressive models like LSTM and RNNs often 
+suffered from "drift," where the lack of long-range attention leads to a loss of structural 
+integrity due to vanishing gradient signals during back propagation in time for long sequences
+thus yielding music pieces with incoherent musical structure.
 
 In this project, we test the hypothesis that music generation is essentially a data-hungry task that 
-requires high-capacity architectures capable of modeling global dependencies. We pivot from LSTMs to a 
-Transformer architecture and expand our training data by a factor of 10, incorporating the EMOPIA and 
+requires high-capacity architectures, which are capable of efficiently scaling to large datasets while
+capturing long ranging global dependencies present in music. We pivot from LSTMs to a 
+transformer architecture and expand our training data by a factor of 10, incorporating the EMOPIA and 
 Pop1K7 datasets. We focus on the "quality-first" approach: establishing a baseline of high-quality music 
 generation first and leaving the integration of sentiment steering up to further research.
 
 \section{Related Work}\label{sec:related_work}
 
 The field of Symbolic Music Generation has increasingly pivoted towards high-capacity generative models, 
-necessitated by the complexity of capturing polyphonic dependencies. This section contextualizes our 
-work within the evolving landscape token-based music generation. 
+necessitated by the complexity of capturing polyphonic dependencies and efficient training. This section 
+contextualizes our work within the evolving landscape token-based music generation. 
 
 Early efforts in affective algorithmic composition primarily relied on rule-based systems to map 
-musical features in either categorical or dimensional spaces \cite{morpheus}. 
-For instance, systems like TransPose employ rule-based piano melody 
-generation from text \cite{davis2014}. Similarly, MetaCompose employed pre-defined chord progression 
-graphs to generate real-time game soundtracks \cite{Scirea}. The adoption of Deep Learning has shifted 
-the focus toward learning complex polyphonic structures directly from data. 
+musical features in either categorical or dimensional spaces \cite{morpheus}. For instance, systems like 
+TransPose employ rule-based piano melody generation from text \cite{davis2014}. Similarly, MetaCompose 
+employed pre-defined chord progression graphs to generate real-time game soundtracks \cite{Scirea}. 
+The adoption of Deep Learning has shifted the focus toward learning complex polyphonic structures directly 
+from data. 
 However, achieving structurally coherent and human like music remains a primary challenge. 
 Ferreira and Whitehead \cite{vgmidi} utilized a single-layer multiplicative Long Short-Term Memory (LSTM) 
 network with 4,096 units. This model was trained as a generative language model to predict the 
@@ -75,14 +78,14 @@ However, they noted that the produced music often exhibited structural inconsist
 This shows that while in theory recurrent models like LSTM are able to model long range dependencies,
 these models are struggle to maintain coherence in practise.
 
-Inspired by recent advances in NLP, Transformer-based models seem to be excellent at long range 
+Inspired by recent advances in NLP, transformer-based models seem to be excellent at long range 
 sequence modelling. This observation serves as the primary catalyst for the transition to 
-the Transformer-based architecture proposed in this work. Recent surveys support this intuition \cite{Ji2023} 
-highlighting the shift from RNNs to self-attention mechanisms and noting that Transformers better 
+the transformer-based architecture proposed in this work. Recent surveys support this intuition \cite{Ji2023} 
+highlighting the shift from RNNs to self-attention mechanisms and noting that transformers better 
 capture the periodic and hierarchical nature of music.
 
 Transformer architectures are considered data hungry, which leads us to the question of scale and 
-quality of the training data. \cite{emopia} demonstrated that pre-training on a large, unlabelled 
+quality of the training data. \cite{emopia} demonstrated that pre-training on a large, unlabeled 
 data corpus with subsequent finetuning significantly improves the subjective "humanness" and "richness" 
 of generated pieces. We extend this paradigm by aggregating three distinct piano datasets 
 VGMIDI \cite{vgmidi}, EMOPIA \cite{emopia}, and Pop1K7 \cite{compoundword} to maximize the model's exposure 
@@ -90,7 +93,7 @@ to diverse harmonic and emotional structures. Compared to modern large-scale cor
 the proposed dataset is still considered in scale but marks a step into the direction of Big Data 
 Regimes in Symbolic Music Generation.
 
-The effectiveness of Transformer-based music generation is heavily predicated on the choice of 
+The effectiveness of transformer-based music generation is heavily predicated on the choice of 
 symbolic encoding. Several encoding schemes have been proposed. A Midi like encoding has been 
 proposed by \cite{Oore2017} which uses \texttt{note-on}, \texttt{note-off}, and \texttt{velocity} 
 tokens, alongside \texttt{time-shift} tokens to represent absolute time intervals in milliseconds.
@@ -100,15 +103,15 @@ tokens and includes \texttt{tempo} tokens, providing a more rhythmically structu
 aligns better with musical theory. More recent approaches use Compound Word tokenization which 
 further optimizes sequence length and computational efficiency \cite{compoundword}. In this scheme, 
 related tokens (e.g., pitch, duration, and velocity) are grouped into a single "super token" or 
-compound word at each time step which reduces the total vocabulary size thus enabling the Transformer to
+compound word at each time step which reduces the total vocabulary size thus enabling the transformer to
 attend to longer sequences, yielding better musical structure and model training properties. 
 
-It can therefore be concluded that  our work contributes the following to the research community:
+Our work makes the following contributions to the research community:
 
 \begin{itemize}
-  \item Combined dataset of piano music
-  \item Training of decoder only style transformer on the dataset
-  \item evaluation of produced music
+  \item Proposes a large pop piano dataset for symbolic music generation
+  \item Trains a Decoder-style transformer
+  \item Outlines the necessity to move to a Big Data Regime for Music Generation
 \end{itemize}
 
 \section{Experimental Setup}\label{subsec:data}
@@ -142,7 +145,7 @@ the final data mix.
 Consequently, the final combined dataset constitutes 2.25M tokens of transcribed piano music.
 
 \subsection{Model Architecture}\label{subsec:model}
-We utilize a decoder-only Transformer. The input to the model at time $t$ is a projected embedding of 
+We utilize a decoder-style Transformer. The input to the model at time $t$ is a projected embedding of 
 the music token. The architecture consists 2 stacked decoder blocks, each employing a self-attention 
 layer that computes: 
 
