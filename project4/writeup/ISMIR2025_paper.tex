@@ -36,8 +36,8 @@ Preliminary results indicate that while the model learns basic structural depend
 evidenced by n-gram structural cosine similarity metrics, the transition from LSTM to Transformer 
 significantly improves the stability of the generated musical sequences while also pointing 
 out the need for large scale datasets to satisfy the intensive data demand of these models.
-This demonstrates the viability of employing transformer architectures for Music Generation
-in the current ubiquitous Big Data Regime.
+This demonstrates the viability of employing transformer architectures for Music Generation,
+in line with Big Data Regime currently ubiquitous in other domains of Machine Learning.
 \end{abstract}
 
 \section{Introduction}\label{sec:introduction}
@@ -220,6 +220,10 @@ This indicates that model successfully learned the features of dataset and model
 
 During generation, we introduce a \texttt{--seqinit} parameter that constrains the model to begin each sequence with a predefined set of tokens.
 This mechanism provides the model with an explicit musical context at generation time and allows controlled similarity to a reference piece by modifying the initial token sequence.
+Further, we introduced a \texttt{--temp} parameter for Temperature Scaling. This allows us change the distribution over logit activations during inference, 
+allowing us to push the model into regions of lower probability mass to see if this increases the produced musical quality. We combined Temperature Scaling 
+with Top-k Sampling, hence introducing a \texttt{--topk} parameter. This allows us to restrict the sampling process during generation to only sample 
+from a specific subset of tokens instead of the entire distribution.
 
 Prior to training, the model produces near-random token distributions that lack musical coherence (e.g., \texttt{t\_120 v\_56 d\_whole\_0 n\_40 w\_1599}). 
 After training, the generated output adheres to valid symbolic music syntax, consistently ordering tempo ($t$), velocity ($v$), duration ($d$), and note ($n$) tokens (e.g., \texttt{t\_120 v\_56 d\_eighth\_0 v\_60 d\_quarter\_0 n\_79}), indicating that the model has learned basic structural constraints of the representation.
@@ -271,6 +275,7 @@ professional-level composition.
 
 
 \bibliographystyle{IEEEtran}
+
 \bibliography{references}
 
 
