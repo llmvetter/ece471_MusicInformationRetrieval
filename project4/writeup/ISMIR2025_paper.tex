@@ -27,8 +27,8 @@
 
 \begin{abstract}
 This work addresses the limitations of recurrent architectures and small-scale datasets in 
-symbolic music generation. Building upon previous attempts based on LSTMs — which yielded 
-suboptimal results in musical coherence — we propose a transition to a transformer-based 
+symbolic music generation. Building upon previous attempts based on LSTMs, which yielded 
+suboptimal results in musical coherence, we propose a transition to a transformer-based 
 architecture. By aggregating three distinct datasets (VGMIDI, EMOPIA, and Pop1K7), 
 we train a decoder-style transformer on a large-scale corpus of approximately 2.25M million tokens. 
 Our model employs a vocabulary of 1,350 unique tokens to represent melody and harmony. 
@@ -43,8 +43,8 @@ in the current ubiquitous Big Data Regime.
 \section{Introduction}\label{sec:introduction}
 Symbolic music generation has evolved from rule-based systems {davis2014} to sophisticated deep 
 generative models capable of capturing complex and nuanced polyphonic structures \cite{compoundword}. 
-However, two primary challenges persist: the effective modeling of long-range dependencies in 
-full-song compositions and the effective training on large scale datasets. 
+However, two primary challenges persist: 1. the effective modeling of long-range dependencies in 
+full-song compositions and 2. the effective training on large scale datasets. 
 Previous work \cite{vgmidi} attempted to use Long Short-Term Memory (LSTM) networks trained on the 
 VGMIDI dataset. However, these autoregressive models like LSTM and RNNs often 
 suffered from "drift," where the lack of long-range attention leads to a loss of structural 
@@ -113,6 +113,14 @@ Our work makes the following contributions to the research community:
   \item Trains a Decoder-style transformer
   \item Outlines the necessity to move to a Big Data Regime for Music Generation
 \end{itemize}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.85\columnwidth]{Pipeline.png}%
+    \caption{Overall pipeline of data processing, training and generating midi}
+    \label{fig:pipeline}
+\end{figure}
+
 
 \section{Experimental Setup}\label{subsec:data}
 
@@ -210,9 +218,6 @@ This indicates that model successfully learned the features of dataset and model
   \label{tab:scs-after}
 \end{table}
 
-
-\subsection{Generating Songs}
-
 During generation, we introduce a \texttt{--seqinit} parameter that constrains the model to begin each sequence with a predefined set of tokens.
 This mechanism provides the model with an explicit musical context at generation time and allows controlled similarity to a reference piece by modifying the initial token sequence.
 
@@ -225,19 +230,35 @@ In contrast, Table~\ref{tab:scs-after} demonstrates a substantial increase in si
 
 This trend suggests that the transformer effectively captures local and mid-range structural patterns in symbolic music, contributing to more coherent musical sequences.
 
+To further validate, we analyzed the relative frequency of token types over a fixed window of generated and reference ground-truth sequences from one of the songs.
+The distributions of note ($n$), velocity ($v$), and duration ($d$) tokens were highly similar between generated and real data.
+For example, in the token range [50:150], the ground-truth sequence contained 38 note tokens, 31 velocity tokens, and 30 duration tokens, while the generated sequence contained 46, 29, and 25 respectively.
 
 \section{Discussion and Error Analysis}
 
 While the Structural Cosine Similarity shows clear evidence that the model is learning, the quality of the generated music was extremely low. Since the metrics indicated that this issue did not originate from the training stage, we conducted an error analysis at an earlier data processing stage.
 
-To verify whether the encoder and decoder used in data processing were functioning correctly, we first encoded a piece of music from one of the datasets into its symbolic representation and then decoded it back into a MIDI file. 
-Theoretically, if both the encoder and decoder are implemented correctly, this process should reproduce the same music as the reference piece.
+\subsection{Error Analysis}
 
-However, the generated output was only approximately 3 seconds long and sounded entirely different from the original song. 
-To further isolate the possibility of dataset corruption, we implemented an alternative encoder and decoder using miditok, a Python package for MIDI file tokenization \cite{miditok}. 
-When the same error analysis procedure was performed using the miditok encoder and decoder, the reconstruction worked correctly and reproduced the original song.
+To rule out dataset corruption as a contributing factor, we trained the model on each dataset individually and on all possible combinations of the datasets (six configurations in total).
+None of these configurations yielded a noticeable improvement in generation quality, suggesting that the observed failures do not originate from the training data.
 
-This result clearly indicates that the source of the error lies in the encoder and decoder implementation based on \cite{vgmidi}.
+To isolate the source of failure, we performed an encoder–decoder round-trip test on the training data.
+A reference MIDI file was first encoded into symbolic tokens and then decoded back into MIDI using our implementation based on \cite{vgmidi}.
+If the encoder and decoder were correct, this process should approximately reconstruct the original piece.
+
+However, the decoded output was consistently corrupted: the reconstructed MIDI files were dramatically shorter in duration and exhibited severe temporal distortion.
+This failure occurred even when no model inference was involved, indicating that the issue was independent of training or generation.
+
+To verify that the dataset itself was not corrupted, we repeated the same round-trip experiment using \texttt{miditok} \cite{miditok}, a widely used MIDI tokenization library.
+In contrast, the miditok-based encoder and decoder successfully reconstructed the original music with correct timing and pitch structure.
+
+This experiment conclusively demonstrates that the primary source of error lies in the custom encoder–decoder implementation rather than in the Transformer model.
+
+\subsection{LSTM and Transformer}
+The transition from LSTM to Transformer addressed the "quality" bottleneck. However, the error analysis
+reveals that the model still struggles with:
+
 \begin{itemize}
   \item \textbf{Metric Consistency}: Occasionally skipping beats or losing the 4/4 time signature.
   \item \textbf{Harmonic Logic}: While individual notes are correctly formatted, the global harmonic progression 
