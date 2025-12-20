@@ -20,6 +20,11 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
+\bibitem{davis2014}
+\BIBentryALTinterwordspacing
+H.~Davis and S.~M. Mohammad, ``Generating music from literature,'' \emph{arXiv preprint arXiv:1403.2124}, 2014. [Online]. Available: \url{https://arxiv.org/abs/1403.2124}
+\BIBentrySTDinterwordspacing
+
 \bibitem{compoundword}
 \BIBentryALTinterwordspacing
 W.-Y. Hsiao, J.-Y. Liu, Y.-C. Yeh, and Y.-H. Yang, ``Compound word transformer: Learning to compose full-song music over dynamic directed hypergraphs,'' \emph{arXiv preprint arXiv:2101.02402}, 2021. [Online]. Available: \url{https://arxiv.org/abs/2101.02402}
@@ -31,11 +36,6 @@ L.~N. Ferreira and J.~Whitehead, ``Learning to generate music with sentiment,'' 
 \bibitem{morpheus}
 \BIBentryALTinterwordspacing
 D.~Herremans and E.~Chew, ``Morpheus: Generating structured music with constrained patterns and tension,'' \emph{arXiv preprint arXiv:1812.04832}, 2018. [Online]. Available: \url{https://arxiv.org/abs/1812.04832}
-\BIBentrySTDinterwordspacing
-
-\bibitem{davis2014}
-\BIBentryALTinterwordspacing
-H.~Davis and S.~M. Mohammad, ``Generating music from literature,'' \emph{arXiv preprint arXiv:1403.2124}, 2014. [Online]. Available: \url{https://arxiv.org/abs/1403.2124}
 \BIBentrySTDinterwordspacing
 
 \bibitem{Scirea}

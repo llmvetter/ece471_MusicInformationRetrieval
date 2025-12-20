@@ -219,44 +219,6 @@
 }
 %%%
 
-% Header
-\if@submission\else
-  \RequirePackage{fancyhdr}
-  \pagestyle{fancy}
-  \fancyhf{}
-  \fancyhead[l]{Proceedings of the 26th ISMIR Conference, Daejeon, Korea, September 21--25, 2025}
-  \thispagestyle{plain}
-\fi
-
-% Copyright notice
-\newcommand{\permission}{%
-  \begin{figure}[b]{%
-    \footnotesize
-    {\includegraphics[alt={CC-BY License},height=0.45cm]{cc_by.pdf}}
-    \vskip -.45cm
-    \begin{spacing}{1.1}
-      \hskip 1.5cm \copyright \hskip .1cm \authorname.
-      Licensed under a Creative Commons Attribution 4.0 International License (CC BY 4.0).
-      \textbf{Attribution:} \authorname,
-      ``\removelinebreaks{\@title}'',
-      \if@lbd
-        \if@submission
-          submitted to \textit{ISMIR LBD}, 2025.
-        \else
-          in \textit{Extended Abstracts for the Late-Breaking Demo Session of the \conferenceedition\ Int. Society for Music Information Retrieval Conf.,} \conferenceplace, \conferenceyear.
-        \fi
-      \else
-        \if@submission
-          submitted to \textit{ISMIR}, 2025.
-        \else
-          in \emph{Proc. of the \conferenceedition\ Int. Society for Music Information Retrieval Conf.,} \conferenceplace, \conferenceyear.
-        \fi
-      \fi
-    \end{spacing}
-    }
-  \end{figure}
-}
-
 % Author information
 \if@submission
   \gdef\@author{
