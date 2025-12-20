@@ -41,7 +41,7 @@ in the current ubiquitous Big Data Regime.
 \end{abstract}
 
 \section{Introduction}\label{sec:introduction}
-Symbolic music generation has evolved from rule-based systems {davis2014} to sophisticated deep 
+Symbolic music generation has evolved from rule-based systems \cite{davis2014} to sophisticated deep 
 generative models capable of capturing complex and nuanced polyphonic structures \cite{compoundword}. 
 However, two primary challenges persist: 1. the effective modeling of long-range dependencies in 
 full-song compositions and 2. the effective training on large scale datasets. 
@@ -124,8 +124,8 @@ Our work makes the following contributions to the research community:
 
 \section{Experimental Setup}\label{subsec:data}
 
-The following sections will outline the approach we took to train our transformer architecture, the 
-compilation of the dataset we trained on. We treat 
+The following sections will outline the approach taken to train our transformer architecture 
+as well as the compilation of the dataset we trained on. We treat 
 music modeling as a language modeling task. Musical events are encoded according to the 
 encoding scheme proposed in \cite{vgmidi} utilizing \texttt{pitch},
 \texttt{duration}, \texttt{velocity} and \texttt{tempo} tokens. We chose this approach for 
@@ -133,7 +133,7 @@ it's more simplistic design when compared to more complex tokenization schemes.
 This yields a vocabulary of $n=1,350$ distinct tokens.
 
 \subsection{Data}
-We combine three commonly used datasets piano datasets in order to increase the training data size.
+We combine three commonly used piano datasets in order to increase the training data size.
 The EMOPIA dataset \cite{emopia} provides a multi-modal (audio/MIDI) foundation for emotion-labeled 
 pop piano. It is composed of 1087 music clips from 387 songs transcribed from YouTube, encompassing a 
 diverse set of playing styles and high musical quality. This dataset contributes 480.335 tokens 
