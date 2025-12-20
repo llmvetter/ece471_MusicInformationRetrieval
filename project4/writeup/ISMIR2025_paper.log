@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.9.20)  19 DEC 2025 21:51
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.9.20)  19 DEC 2025 22:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -198,12 +198,6 @@ Overfull \hbox (12.00002pt too wide) in paragraph at lines 26--26
  [][] 
  []
 
-! Undefined control sequence.
-\maketitle ...wocolumn [\@maketitle ] \permission 
-                                                  \@thanks \endgroup \setcou...
-l.26 \maketitle
-               
-? 
 
 
 
@@ -226,21 +220,21 @@ LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
 (/usr/local/texlive/2025basic/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
-<Pipeline.png, id=8, 753.81625pt x 934.49126pt>
+<Pipeline.png, id=8, 602.25pt x 1164.35pt>
 File: Pipeline.png Graphic file (type png)
 <use Pipeline.png>
 Package pdftex.def Info: Pipeline.png  used on input line 119.
-(pdftex.def)             Requested size: 221.64624pt x 274.75995pt.
+(pdftex.def)             Requested size: 233.31259pt x 451.07437pt.
 
 
 
 
 [2 <./Pipeline.png>]
-<loss_curve.png, id=20, 409.7709pt x 328.1058pt>
+<loss_curve.png, id=17, 409.7709pt x 328.1058pt>
 File: loss_curve.png Graphic file (type png)
 <use loss_curve.png>
 Package pdftex.def Info: loss_curve.png  used on input line 177.
-(pdftex.def)             Requested size: 221.64624pt x 177.47487pt.
+(pdftex.def)             Requested size: 233.31259pt x 186.81197pt.
 
 Underfull \hbox (badness 1460) in paragraph at lines 224--226
 \T1/ptm/m/n/10 ra-tion ($\OML/cmm/m/it/10 d$\T1/ptm/m/n/10 ), and note ($\OML/c
@@ -251,24 +245,30 @@ mm/m/it/10 n$\T1/ptm/m/n/10 ) to-kens (e.g., \T1/pcr/m/n/10 t_120 v_56
 
 
 
-[3 <./loss_curve.png>] (./ISMIR2025_paper.bbl
+[3 <./loss_curve.png>]
 
-)
+(./ISMIR2025_paper.bbl
 
-[4] (./ISMIR2025_paper.aux)
+[4])
+
+
+
+[5
+
+] (./ISMIR2025_paper.aux)
  ***********
 LaTeX2e <2025-06-01> patch level 1
 L3 programming layer <2025-09-02>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 2741 strings out of 469269
- 40466 string characters out of 5467112
- 447984 words of memory out of 5000000
- 31144 multiletter control sequences out of 15000+600000
+ 2740 strings out of 469269
+ 40456 string characters out of 5467112
+ 449984 words of memory out of 5000000
+ 31143 multiletter control sequences out of 15000+600000
  654020 words of font info for 73 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
- 71i,15n,79p,375b,372s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 71i,15n,79p,566b,372s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmex1
 0.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/amsfonts/cm/c
 mmi10.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/amsfonts/
@@ -279,10 +279,10 @@ urier/ucrr8a.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/urw/times
 /utmb8a.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/urw/times/utmr
 8a.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/urw/times/utmri8a.p
 fb>
-Output written on ISMIR2025_paper.pdf (4 pages, 245585 bytes).
+Output written on ISMIR2025_paper.pdf (5 pages, 245117 bytes).
 PDF statistics:
- 68 PDF objects out of 1000 (max. 8388607)
- 39 compressed objects within 1 object stream
+ 71 PDF objects out of 1000 (max. 8388607)
+ 41 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  11 words of extra memory for PDF output out of 10000 (max. 10000000)
 

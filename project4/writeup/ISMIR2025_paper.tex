@@ -30,14 +30,14 @@ This work addresses the limitations of recurrent architectures and small-scale d
 symbolic music generation. Building upon previous attempts based on LSTMs, which yielded 
 suboptimal results in musical coherence, we propose a transition to a transformer-based 
 architecture. By aggregating three distinct datasets (VGMIDI, EMOPIA, and Pop1K7), 
-we train a decoder-style transformer on a large-scale corpus of approximately 2.25M million tokens. 
+we train a decoder-style transformer on a large-scale corpus of approximately 2.25 million tokens. 
 Our model employs a vocabulary of 1,350 unique tokens to represent melody and harmony. 
 Preliminary results indicate that while the model learns basic structural dependencies, as 
 evidenced by n-gram structural cosine similarity metrics, the transition from LSTM to Transformer 
 significantly improves the stability of the generated musical sequences while also pointing 
 out the need for large scale datasets to satisfy the intensive data demand of these models.
-This demonstrates the viability of employing transformer architectures for Music Generation,
-in line with Big Data Regime currently ubiquitous in other domains of Machine Learning.
+This demonstrates the viability of employing transformer architectures for music generation
+in the current ubiquitous Big Data regime.
 \end{abstract}
 
 \section{Introduction}\label{sec:introduction}
@@ -48,7 +48,7 @@ full-song compositions and 2. the effective training on large scale datasets.
 Previous work \cite{vgmidi} attempted to use Long Short-Term Memory (LSTM) networks trained on the 
 VGMIDI dataset. However, these autoregressive models like LSTM and RNNs often 
 suffered from "drift," where the lack of long-range attention leads to a loss of structural 
-integrity due to vanishing gradient signals during back propagation in time for long sequences
+integrity due to vanishing gradient signals during back propagation in time for long sequences,
 thus yielding music pieces with incoherent musical structure.
 
 In this project, we test the hypothesis that music generation is essentially a data-hungry task that 
@@ -62,7 +62,7 @@ generation first and leaving the integration of sentiment steering up to further
 
 The field of Symbolic Music Generation has increasingly pivoted towards high-capacity generative models, 
 necessitated by the complexity of capturing polyphonic dependencies and efficient training. This section 
-contextualizes our work within the evolving landscape token-based music generation. 
+contextualizes our work within the evolving landscape of token-based music generation. 
 
 Early efforts in affective algorithmic composition primarily relied on rule-based systems to map 
 musical features in either categorical or dimensional spaces \cite{morpheus}. For instance, systems like 
@@ -76,10 +76,10 @@ network with 4,096 units. This model was trained as a generative language model 
 next musical "word" in a custom 225-token vocabulary representing pitch, duration, velocity, and tempo. 
 However, they noted that the produced music often exhibited structural inconsistency. 
 This shows that while in theory recurrent models like LSTM are able to model long range dependencies,
-these models are struggle to maintain coherence in practise.
+these models struggle to maintain coherence in practice.
 
 Inspired by recent advances in NLP, transformer-based models seem to be excellent at long range 
-sequence modelling. This observation serves as the primary catalyst for the transition to 
+sequence modeling. This observation serves as the primary catalyst for the transition to 
 the transformer-based architecture proposed in this work. Recent surveys support this intuition \cite{Ji2023} 
 highlighting the shift from RNNs to self-attention mechanisms and noting that transformers better 
 capture the periodic and hierarchical nature of music.
@@ -90,8 +90,8 @@ data corpus with subsequent finetuning significantly improves the subjective "hu
 of generated pieces. We extend this paradigm by aggregating three distinct piano datasets 
 VGMIDI \cite{vgmidi}, EMOPIA \cite{emopia}, and Pop1K7 \cite{compoundword} to maximize the model's exposure 
 to diverse harmonic and emotional structures. Compared to modern large-scale corpora used in NLP, 
-the proposed dataset is still considered in scale but marks a step into the direction of Big Data 
-Regimes in Symbolic Music Generation.
+the proposed dataset is still considered small in scale but marks a step in the direction of Big Data 
+regimes in Symbolic Music Generation.
 
 The effectiveness of transformer-based music generation is heavily predicated on the choice of 
 symbolic encoding. Several encoding schemes have been proposed. A Midi like encoding has been 
@@ -100,7 +100,7 @@ tokens, alongside \texttt{time-shift} tokens to represent absolute time interval
 Introduced by \cite{Huang2020}, the REMI style encoding adopts a metrical, beat-based approach using 
 \texttt{bar} and \texttt{sub beat} tokens. It replaces \texttt{note-off} with explicit \texttt{duration} 
 tokens and includes \texttt{tempo} tokens, providing a more rhythmically structured representation that 
-aligns better with musical theory. More recent approaches use Compound Word tokenization which 
+aligns better with musical theory. More recent approaches use compound word tokenization which 
 further optimizes sequence length and computational efficiency \cite{compoundword}. In this scheme, 
 related tokens (e.g., pitch, duration, and velocity) are grouped into a single "super token" or 
 compound word at each time step which reduces the total vocabulary size thus enabling the transformer to
@@ -116,8 +116,8 @@ Our work makes the following contributions to the research community:
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.95\columnwidth]{Pipeline.png}%
-    \caption{Overall pipeline of data processing, training and generating midi}
+    \includegraphics[width=1.0\columnwidth]{Pipeline.png}%
+    \caption{Overall pipeline of data processing, training and generating MIDI}
     \label{fig:pipeline}
 \end{figure}
 
@@ -129,37 +129,37 @@ as well as the compilation of the dataset we trained on. We treat
 music modeling as a language modeling task. Musical events are encoded according to the 
 encoding scheme proposed in \cite{vgmidi} utilizing \texttt{pitch},
 \texttt{duration}, \texttt{velocity} and \texttt{tempo} tokens. We chose this approach for 
-it's more simplistic design when compared to more complex tokenization schemes. 
+its more simple design when compared to more complex tokenization schemes. 
 This yields a vocabulary of $n=1,350$ distinct tokens.
 
 \subsection{Data}
 We combine three commonly used piano datasets in order to increase the training data size.
 The EMOPIA dataset \cite{emopia} provides a multi-modal (audio/MIDI) foundation for emotion-labeled 
 pop piano. It is composed of 1087 music clips from 387 songs transcribed from YouTube, encompassing a 
-diverse set of playing styles and high musical quality. This dataset contributes 480.335 tokens 
-to the final datamix.
+diverse set of playing styles and high musical quality. This dataset contributes 480,335 tokens 
+to the final data mix.
 
 The Pop1K7 dataset \cite{compoundword} is composed of machine transcriptions of 1,747 audio recordings of 
 piano covers of Japanese anime, Korean and Western pop music, amounting to over 100 hours worth of data. The
 transcription was done with the “onsets-and-frames” RNN-based piano transcription model
-\cite{Hawthorne2017}. This dataset is the largest among the three contributing 1.577.835 
+\cite{Hawthorne2017}. This dataset is the largest among the three, contributing 1,577,835 
 tokens to the final data mix.
 
-The VGMIDI \cite{vgmidi} is composed of 728 pieces extracted from video game soundtracks. 
+The VGMIDI dataset \cite{vgmidi} is composed of 728 pieces extracted from video game soundtracks. 
 All the pieces are piano arrangements of the soundtracks and vary in length from 26 seconds 
-to 3 minutes. This dataset is the smallest among the three, contributing 202.030 tokens to 
+to 3 minutes. This dataset is the smallest among the three, contributing 202,030 tokens to 
 the final data mix.
 
 Consequently, the final combined dataset constitutes 2.25M tokens of transcribed piano music.
 
 \subsection{Model Architecture}\label{subsec:model}
 We utilize a decoder-style Transformer. The input to the model at time $t$ is a projected embedding of 
-the music token. The architecture consists 2 stacked decoder blocks, each employing a self-attention 
+the music token. The architecture consists of 2 stacked decoder blocks, each employing a self-attention 
 layer that computes: 
 
 $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
 
-Where $d_k$ is the embedding dimension which we set to 128. We using 8 attention heads and a Feed Forward Neural
+Where $d_k$ is the embedding dimension which we set to 128. We use 8 attention heads and a Feed-Forward Neural
 Network size of 512 and a sequence length (attention window size) of 256 tokens. This proposed architecture 
 yields a model with approximately 1.7M trainable parameters.
 
@@ -174,7 +174,7 @@ architecture as well as for the training subset.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.95\columnwidth]{loss_curve.png}%
+    \includegraphics[width=1.0\columnwidth]{loss_curve.png}%
     \caption{Training loss and validation curve. Both loss and validation plateau after 15 epoch.}
     \label{fig:loss-graph}
 \end{figure}
@@ -220,10 +220,6 @@ This indicates that model successfully learned the features of dataset and model
 
 During generation, we introduce a \texttt{--seqinit} parameter that constrains the model to begin each sequence with a predefined set of tokens.
 This mechanism provides the model with an explicit musical context at generation time and allows controlled similarity to a reference piece by modifying the initial token sequence.
-Further, we introduced a \texttt{--temp} parameter for Temperature Scaling. This allows us change the distribution over logit activations during inference, 
-allowing us to push the model into regions of lower probability mass to see if this increases the produced musical quality. We combined Temperature Scaling 
-with Top-k Sampling, hence introducing a \texttt{--topk} parameter. This allows us to restrict the sampling process during generation to only sample 
-from a specific subset of tokens instead of the entire distribution.
 
 Prior to training, the model produces near-random token distributions that lack musical coherence (e.g., \texttt{t\_120 v\_56 d\_whole\_0 n\_40 w\_1599}). 
 After training, the generated output adheres to valid symbolic music syntax, consistently ordering tempo ($t$), velocity ($v$), duration ($d$), and note ($n$) tokens (e.g., \texttt{t\_120 v\_56 d\_eighth\_0 v\_60 d\_quarter\_0 n\_79}), indicating that the model has learned basic structural constraints of the representation.
@@ -234,15 +230,13 @@ In contrast, Table~\ref{tab:scs-after} demonstrates a substantial increase in si
 
 This trend suggests that the transformer effectively captures local and mid-range structural patterns in symbolic music, contributing to more coherent musical sequences.
 
-To further validate, we analyzed the relative frequency of token types over a fixed window of generated and reference ground-truth sequences from one of the songs.
+To further validate, we analyzed the relative frequency of token types over a fixed window comparing generated against reference ground-truth sequences from one of the songs.
 The distributions of note ($n$), velocity ($v$), and duration ($d$) tokens were highly similar between generated and real data.
 For example, in the token range [50:150], the ground-truth sequence contained 38 note tokens, 31 velocity tokens, and 30 duration tokens, while the generated sequence contained 46, 29, and 25 respectively.
 
 \section{Discussion and Error Analysis}
 
 While the Structural Cosine Similarity shows clear evidence that the model is learning, the quality of the generated music was extremely low. Since the metrics indicated that this issue did not originate from the training stage, we conducted an error analysis at an earlier data processing stage.
-
-\subsection{Error Analysis}
 
 To rule out dataset corruption as a contributing factor, we trained the model on each dataset individually and on all possible combinations of the datasets (six configurations in total).
 None of these configurations yielded a noticeable improvement in generation quality, suggesting that the observed failures do not originate from the training data.
@@ -259,24 +253,19 @@ In contrast, the miditok-based encoder and decoder successfully reconstructed th
 
 This experiment conclusively demonstrates that the primary source of error lies in the custom encoder–decoder implementation rather than in the Transformer model.
 
-\subsection{LSTM and Transformer}
-The transition from LSTM to Transformer addressed the "quality" bottleneck. However, the error analysis
-reveals that the model still struggles with:
+\section{Conclusion}
+This work investigated the possibility of transitioning from an LSTM architecture to Transformer-based models for symbolic music generation. It operated under the hypothesis that high-capacity models trained on aggregated datasets would resolve the structural "drift" often observed in LSTMs. By training a decoder-only Transformer with a dataset of 2.25 million tokens from VGMIDI, EMOPIA, and Pop1K7, we established a "Big Data" baseline.
 
-\begin{itemize}
-  \item \textbf{Metric Consistency}: Occasionally skipping beats or losing the 4/4 time signature.
-  \item \textbf{Harmonic Logic}: While individual notes are correctly formatted, the global harmonic progression 
-  sometimes lacks a clear tonal center.
-\end{itemize}
+Our quantitative results strongly suggest that the Transformer architecture successfully captured the complex dependencies of symbolic music. The convergence of training and validation loss and high n-gram Structural Cosine Similarity demonstrate that the model effectively learned the syntax and hierarchical structure. Furthermore, the distributions of note, velocity, and duration tokens in the generated sequences closely matched the ground truth, confirming the model's ability to replicate statistical musical patterns.
 
-The results confirm that the Transformer is less prone to the ``unraveling'' seen in LSTMs but requires 
-even more data or more refined conditioning (such as the emotion labels in EMOPIA) to reach 
-professional-level composition.
+However, despite these promising metrics, the quality of the generated audio remained low. Our subsequent error analysis isolated the root cause of this discrepancy as a critical flaw in the symbolic encoder-decoder implementation, rather than the model architecture itself. Round-trip tests confirmed that while the model correctly predicted tokens, the decoding stage introduced severe temporal distortions and truncation.
 
+In conclusion, this study confirms that the Transformer architecture maintains structural coherence. Future work should focus on integrating robust tokenization libraries like miditok to resolve the decoding issues, further scaling the dataset, and re-introducing the emotion-based conditioning available in the EMOPIA dataset.
+
+\vspace{1.0em}
+\noindent \textbf{Disclosing the Use of AI} \\
+The authors utilized generative AI tools, specifically ChatGPT and Google Gemini, solely for the purposes of spell-checking and grammatical revision during the preparation of this manuscript. No AI tools were used for data generation, analysis, or the formulation of scientific conclusions.
 
 \bibliographystyle{IEEEtran}
-
 \bibliography{references}
-
-
 \end{document}
